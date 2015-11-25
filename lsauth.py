@@ -36,6 +36,16 @@ def add_user(username):
     pickle.dump(auth_users, open(LS_AUTH_DB_FILE, "wb"))
 
 
+def rem_user(username):
+    if not os.path.isfile(LS_AUTH_DB_FILE):
+        print('ERROR: could not find database file \'{0}\''.format(LS_AUTH_DB_FILE))
+
+    auth_users = pickle.load(open(LS_AUTH_DB_FILE, "rb"))
+    if username in auth_users.keys():
+        auth_users.pop(username, None)
+        pickle.dump(auth_users, open(LS_AUTH_DB_FILE, "wb"))
+
+
 def get_args():
     parser = argparse.ArgumentParser(description='Module for authenticating users')
     parser.add_argument('-add', nargs=1, metavar='user', help='add user')
@@ -50,4 +60,4 @@ if __name__ == '__main__':
     if args.add:
         add_user(args.add[0])
     elif args.rem:
-        pass
+        rem_user(args.rem[0])
