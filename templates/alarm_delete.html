@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<head>
+    <title>Light Switch</title>
+</head>
+
+<body>
+    <h1> 
+        Alarm deleted: {{ hour }}:{% if minute|int < 10 %}0{% endif %}{{ minute }} {{ AMPM }} on
+    </h1>
+    {% for day in days %}
+        <h2> {{ day }} </h2>
+    {% endfor %}
+    <a href="/">home</a>
+</body>
+</html>
