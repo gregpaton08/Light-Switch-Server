@@ -10,6 +10,19 @@ import getpass
 LS_AUTH_DB_FILE = 'lsauth_users.p'
 
 
+def check_auth(username, password):
+    if not os.path.isfile(LS_AUTH_DB_FILE):
+        return False
+
+    auth_users = pickle.load(open(LS_AUTH_DB_FILE, "rb"))
+    for key, value in auth_users.iteritems():
+        if key == username:
+            if md5.new(password).digest() == value:
+                return True
+
+    return False
+
+
 def add_user(username):
     auth_users = {}
     if os.path.isfile(LS_AUTH_DB_FILE):
