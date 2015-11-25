@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from flask import Flask, render_template, request
 import RPi.GPIO as GPIO
 import time
@@ -6,6 +8,7 @@ import os
 from crontab import CronTab
 import signal
 import sys
+import lsauth
 app = Flask(__name__)
 
 DEBUG = True
@@ -24,18 +27,26 @@ DAYS_OF_WEEK = [
 ]
 
 @app.route("/")
-def hello():
+@lsauth.requires_auth
+def light_main():
 	return render_template('main.html')
 
 @app.route("/light_on")
+@lsauth.requires_auth
 def light_on():
 	thread.start_new_thread(setChannelHigh, (CHANNEL_ON,) )
         return render_template('main.html')
 	
 @app.route("/light_off")
+@lsauth.requires_auth
 def light_off():
 	thread.start_new_thread(setChannelHigh, (CHANNEL_OFF,) )
         return render_template('main.html')
+
+@app.route("/light_auth")
+@lsauth.requires_auth
+def light_auth():
+    return render_template('main.html')
 
 @app.route("/set_alarm", methods=['GET', 'POST'])
 def set_alarm():
