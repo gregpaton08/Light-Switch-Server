@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify, abort
 import RPi.GPIO as GPIO
 import time
 import thread
@@ -25,6 +25,45 @@ DAYS_OF_WEEK = [
 	'Saturday',
 	'Sunday'
 ]
+
+_URL_ROUTE = '/switches/API/v1.0/switches'
+
+switches = [
+    {
+        'id' : 0,
+        'title' : u'Bedroom',
+        'status' : False,
+        'outlet' : 0
+    }
+]
+
+def turn_light_on(turnOn):
+    channel = CHANNEL_OFF
+    if turnOn:
+        channel = CHANNEL_ON
+    thread.start_new_thread(setChannelHigh, (channel,) )
+
+@app.route(_URL_ROUTE, methods=['GET'])
+def route():
+    return jsonify({'switches' : switches})
+
+@app.route(_URL_ROUTE + '/<int:switch_id>', methods=['PUT'])
+def update_switch(switch_id):
+    switch = [switch for switch in switches if switch['id'] == switch_id]
+    if 0 == len(switch):
+        abort(400)
+    if not request.json:
+        print('NO JSON ==================')
+        abort(400)
+    if 'status' in request.json:
+        pass
+        if type(request.json['status']) is not bool:
+            abort(400)
+        else:
+            turn_light_on(request.json['status'])
+    switch[0]['status'] = request.json.get('status', switch[0]['status'])
+    
+    return jsonify({'switch': switch[0]})
 
 @app.route("/")
 @lsauth.requires_auth
