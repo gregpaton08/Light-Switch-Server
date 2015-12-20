@@ -9,8 +9,10 @@ from crontab import CronTab
 import signal
 import sys
 import lsauth
+import lsswitches
 app = Flask(__name__)
 
+_PORT = 3333
 DEBUG = True
 CHANNEL_ON = 17
 CHANNEL_OFF = 23
@@ -28,14 +30,6 @@ DAYS_OF_WEEK = [
 
 _URL_ROUTE = '/switches/API/v1.0/switches'
 
-switches = [
-    {
-        'id' : 0,
-        'title' : u'Bedroom',
-        'status' : False,
-        'outlet' : 0
-    }
-]
 
 def turn_light_on(turnOn):
     channel = CHANNEL_OFF
@@ -43,12 +37,32 @@ def turn_light_on(turnOn):
         channel = CHANNEL_ON
     thread.start_new_thread(setChannelHigh, (channel,) )
 
+@app.route(_URL_ROUTE, methods=['POST'])
+def add_switch():
+    print("add_switch()")
+    if not request.json:
+        print("NO JSON ================")
+        abort(400)
+    else:
+        print("JSON is good")
+    switch = {
+        'id' : 0,
+        'title' : request.json.get('title', u'Bedroom'),
+        'status' : request.json.get('status', False),
+        'outlet' : 0
+    }
+    print("add switches")
+    lsswitches.add_switch(switch)
+    return jsonify({'switch', switch}), 201
+
 @app.route(_URL_ROUTE, methods=['GET'])
 def route():
+    switches = lsswitches.get_switches()
     return jsonify({'switches' : switches})
 
 @app.route(_URL_ROUTE + '/<int:switch_id>', methods=['PUT'])
 def update_switch(switch_id):
+    switches = lsswitches.get_switches()
     switch = [switch for switch in switches if switch['id'] == switch_id]
     if 0 == len(switch):
         abort(400)
@@ -89,25 +103,25 @@ def light_auth():
 
 @app.route("/set_alarm", methods=['GET', 'POST'])
 def set_alarm():
-	state = request.args.get('state', '')
-	minute = request.args.get('minute', '')
-        hour   = request.args.get('hour', '')
-        days   = request.args.get('days', '')
-	if setAlarm(state, minute, hour, days):
-		dayNums = days.split(",")
-		dayList = []
-		for i in dayNums:
-			dayList.append(DAYS_OF_WEEK[int(i)])
-		print dayList
-		templateData = {
-			'minute' : minute,
-			'hour' : str(int(hour) % 12),
-			'AMPM' : 'PM' if int(hour) > 12 else 'AM',
-			'days' : dayList
-		}
-		return render_template('alarm_set.html', **templateData)
-	else:
-		return render_template('alarm_fail.html')
+    state = request.args.get('state', '')
+    minute = request.args.get('minute', '')
+    hour   = request.args.get('hour', '')
+    days   = request.args.get('days', '')
+    if setAlarm(state, minute, hour, days):
+        dayNums = days.split(",")
+        dayList = []
+        for i in dayNums:
+            dayList.append(DAYS_OF_WEEK[int(i)])
+        print dayList
+        templateData = {
+            'minute' : minute,
+            'hour' : str(int(hour) % 12),
+            'AMPM' : 'PM' if int(hour) > 12 else 'AM',
+            'days' : dayList
+        }
+        return render_template('alarm_set.html', **templateData)
+    else:
+        return render_template('alarm_fail.html')
 
 @app.route("/delete_alarm", methods=['GET', 'POST'])
 def delete_alarm():
@@ -143,7 +157,7 @@ def setAlarm(state, minute, hour, days):
 	if state == 'on':
 		comment = createCronComment(minute, hour, days)
 		# If alarm already exists return True
-		cron = CronTab()
+		cron = CronTab(user=True)
 		iter = cron.find_comment(comment)
 		try:
 			job = iter.next()
@@ -154,7 +168,7 @@ def setAlarm(state, minute, hour, days):
 		except StopIteration:
 			pass
 		#print comment
-		job = cron.new(command='/home/pi/projects/light_switch/light_on.sh')
+		job = cron.new(command='/home/pi/projects/light_switch/light_on.py')
 		job.set_comment(comment)
 		job.minute.on(minute)
 		job.hour.on(hour)
@@ -218,7 +232,7 @@ signal.signal(signal.SIGTERM, signal_term_handler)
 if __name__ == "__main__":
 	try:
 		createPidFile()
-		app.run(host='0.0.0.0', port=3333, debug=DEBUG)
+		app.run(host='0.0.0.0', port=_PORT, debug=DEBUG)
 	except KeyboardInterrupt:
 		deletePidFile()
 	deletePidFile()
