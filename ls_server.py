@@ -39,21 +39,22 @@ def turn_light_on(turnOn):
 
 @app.route(_URL_ROUTE, methods=['POST'])
 def add_switch():
-    print("add_switch()")
     if not request.json:
-        print("NO JSON ================")
         return jsonify({'error', 'no json found'}), 400
     
     switch = {
-        'id' : 0,
-        'title' : request.json.get('title', u'Bedroom'),
+        'room'   : request.json.get('room',   u''),
+        'device' : request.json.get('device', u''),
         'status' : request.json.get('status', False),
-        'outlet' : 0
     }
-    #print("add switches")
-    #lsswitches.add_switch(switch)
-    #switches = lsswitches.get_switches()
+    lsswitches.add_switch(switch)    
+
     return jsonify({'switch': switch}), 201
+
+@app.route(_URL_ROUTE + '/<int:switch_id>', methods=['DELETE'])
+def delete_switch(switch_id):
+    lsswitches.delete_switch(switch_id)
+    return jsonify({'result': True})
 
 @app.route(_URL_ROUTE, methods=['GET'])
 def route():
