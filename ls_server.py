@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from flask import Flask, render_template, request, jsonify, abort
+from flask import Flask, render_template, request, jsonify, abort, make_response
 import RPi.GPIO as GPIO
 import time
 import thread
@@ -42,18 +42,18 @@ def add_switch():
     print("add_switch()")
     if not request.json:
         print("NO JSON ================")
-        abort(400)
-    else:
-        print("JSON is good")
+        return jsonify({'error', 'no json found'}), 400
+    
     switch = {
         'id' : 0,
         'title' : request.json.get('title', u'Bedroom'),
         'status' : request.json.get('status', False),
         'outlet' : 0
     }
-    print("add switches")
-    lsswitches.add_switch(switch)
-    return jsonify({'switch', switch}), 201
+    #print("add switches")
+    #lsswitches.add_switch(switch)
+    #switches = lsswitches.get_switches()
+    return jsonify({'switch': switch}), 201
 
 @app.route(_URL_ROUTE, methods=['GET'])
 def route():
