@@ -124,6 +124,22 @@ def set_alarm():
     else:
         return render_template('alarm_fail.html')
 
+@app.route("/alarms", methods=['POST'])
+def post_alarms():
+    if not request.json:
+        return jsonify({'error', 'no json found'}), 400
+
+    alarm = {
+        'minute' : request.json.get('minute',   u''),
+        'hour'   : request.json.get('hour', u''),
+        'dow'    : request.json.get('dow', u''),
+    }
+
+    if setAlarm('on', alarm['minute'], alarm['hour'], alarm['dow']):
+        return jsonify({ 'alarms' : alarm }), 201
+    else:
+        return jsonify({'error', 'unable to set alarm'}), 400
+
 @app.route("/alarms", methods=['GET'])
 def get_alarms():
     cron = CronTab(user=True)
