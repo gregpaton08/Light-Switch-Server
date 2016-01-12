@@ -88,14 +88,14 @@ def light_main():
 @app.route("/light_on")
 @lsauth.requires_auth
 def light_on():
-	thread.start_new_thread(setChannelHigh, (CHANNEL_ON,) )
-        return render_template('main.html')
+    thread.start_new_thread(setChannelHigh, (CHANNEL_ON,) )
+    return render_template('main.html')
 	
 @app.route("/light_off")
 @lsauth.requires_auth
 def light_off():
-	thread.start_new_thread(setChannelHigh, (CHANNEL_OFF,) )
-        return render_template('main.html')
+    thread.start_new_thread(setChannelHigh, (CHANNEL_OFF,) )
+    return render_template('main.html')
 
 @app.route("/light_auth")
 @lsauth.requires_auth
@@ -124,17 +124,32 @@ def set_alarm():
     else:
         return render_template('alarm_fail.html')
 
+@app.route("/alarms", methods=['GET'])
+def get_alarms():
+    cron = CronTab(user=True)
+    alarms = []
+    index = 0
+    for job in cron:
+        if 'ls_server' in job.comment:
+            job_info = {}
+            job_info['minute'] = str(job.minute)
+            job_info['hour'] = str(job.hour)
+            job_info['dow'] = str(job.dow)
+            alarms.append(job_info)
+
+    return jsonify({ 'alarms' : alarms }), 201
+
 @app.route("/delete_alarm", methods=['GET', 'POST'])
 def delete_alarm():
-        minute = request.args.get('minute', '')
-        hour   = request.args.get('hour', '')
-        days   = request.args.get('days', '')
-	deleteAlarm(minute, hour, days)
-	dayNums = days.split(",")
-        dayList = []
-        for i in dayNums:
-                dayList.append(DAYS_OF_WEEK[int(i)])
-	templateData = {
+    minute = request.args.get('minute', '')
+    hour   = request.args.get('hour', '')
+    days   = request.args.get('days', '')
+    deleteAlarm(minute, hour, days)
+    dayNums = days.split(",")
+    dayList = []
+    for i in dayNums:
+        dayList.append(DAYS_OF_WEEK[int(i)])
+        templateData = {
                 'minute' : minute,
                 'hour' : str(int(hour) % 12),
                 'AMPM' : 'PM' if int(hour) > 12 else 'AM',
@@ -143,12 +158,12 @@ def delete_alarm():
         return render_template('alarm_delete.html', **templateData)
 
 def setChannelHigh(channel):
-	GPIO.setmode(GPIO.BCM)
-        GPIO.setup(channel, GPIO.OUT)
-        GPIO.output(channel, GPIO.HIGH)
-        time.sleep(2)
-        GPIO.output(channel, GPIO.LOW)
-        GPIO.cleanup(channel)
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(channel, GPIO.OUT)
+    GPIO.output(channel, GPIO.HIGH)
+    time.sleep(2)
+    GPIO.output(channel, GPIO.LOW)
+    GPIO.cleanup(channel)
 
 # state: 'on' to create an alarm or 'off' to delete it.
 # minute: 0 tp 59
