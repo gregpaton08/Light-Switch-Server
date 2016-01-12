@@ -127,7 +127,7 @@ def set_alarm():
 @app.route("/alarms", methods=['POST'])
 def post_alarms():
     if not request.json:
-        return jsonify({'error', 'no json found'}), 400
+        return jsonify({'error' : 'no json found'}), 400
 
     alarm = {
         'minute' : request.json.get('minute',   u''),
@@ -138,7 +138,7 @@ def post_alarms():
     if setAlarm('on', alarm['minute'], alarm['hour'], alarm['dow']):
         return jsonify({ 'alarms' : alarm }), 201
     else:
-        return jsonify({'error', 'unable to set alarm'}), 400
+        return jsonify({'error' : 'unable to set alarm'}), 400
 
 @app.route("/alarms", methods=['GET'])
 def get_alarms():
@@ -154,6 +154,22 @@ def get_alarms():
             alarms.append(job_info)
 
     return jsonify({ 'alarms' : alarms }), 201
+
+@app.route("/alarms", methods=['DELETE'])
+def delete_alarms():
+    if not request.json:
+        return jsonify({'error' : 'no json found'}), 400
+
+    alarm = {
+        'minute' : request.json.get('minute',   u''),
+        'hour'   : request.json.get('hour', u''),
+        'dow'    : request.json.get('dow', u''),
+    }
+
+    if deleteAlarm(alarm['minute'], alarm['hour'], alarm['dow']):
+        return jsonify({ 'alarms' : alarm }), 201
+    else:
+        return jsonify({'error' : 'unable to delete alarm'}), 400
 
 @app.route("/delete_alarm", methods=['GET', 'POST'])
 def delete_alarm():
@@ -220,17 +236,16 @@ def setAlarm(state, minute, hour, days):
 		return False
 
 def deleteAlarm(minute, hour, days):
-	comment = createCronComment(minute, hour, days)
-	cron = CronTab()
-	iter = cron.find_comment(comment)
-	try:
-		job = iter.next()
-		while len(job) > 0:
-			cron.remove(job)
-			job = iter.next()
-	except StopIteration:
-		pass
-	cron.write()
+    comment = createCronComment(minute, hour, days)
+    print(comment)
+    cron = CronTab(user=True)
+    for job in cron.find_comment(comment):
+        print(job)
+        cron.remove(job)
+            
+    cron.write()
+
+    return True
 
 def createCronComment(minute, hour, days):
 	comment = 'ls_server_'
