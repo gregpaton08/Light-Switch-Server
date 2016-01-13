@@ -162,12 +162,19 @@ def get_alarms():
 def delete_alarms():
     if not request.json:
         return jsonify({'error' : 'no json found'}), 400
+    
+    id = request.json.get('id', None)
+    if not id:
+        return jsonify({'error' : 'invalid json'}), 400 
 
-    alarm = {
-        'minute' : request.json.get('minute',   u''),
-        'hour'   : request.json.get('hour', u''),
-        'dow'    : request.json.get('dow', u''),
-    }
+    alarms = get_alarms_list()
+    print(alarms)
+    alarm = [x for x in alarms if int(x['id']) == int(id)]
+    if len(alarm) != 1:
+        error_string = 'unable to find an alarm for id ' + str(id)
+        return jsonify({'error' : error_string}), 400
+
+    alarm = alarm[0]
 
     if deleteAlarm(alarm['minute'], alarm['hour'], alarm['dow']):
         return jsonify({ 'alarms' : alarm }), 201
