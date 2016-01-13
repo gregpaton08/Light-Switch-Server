@@ -135,6 +135,18 @@ def post_alarms():
         'dow'    : request.json.get('dow', u''),
     }
 
+    alarms = get_alarms_list()
+    id = 0
+    sorted_alarms = sorted(alarms, key=lambda k: k['id']) 
+    print(sorted_alarms)
+    for curr in sorted_alarms:
+        if id == curr['id']:
+            id = id + 1
+        else:
+            break;
+
+    alarm['id'] = id
+
     if setAlarm('on', alarm['minute'], alarm['hour'], alarm['dow']):
         return jsonify({ 'alarms' : alarm }), 201
     else:
@@ -142,16 +154,7 @@ def post_alarms():
 
 @app.route("/alarms", methods=['GET'])
 def get_alarms():
-    cron = CronTab(user=True)
-    alarms = []
-    index = 0
-    for job in cron:
-        if 'ls_server' in job.comment:
-            job_info = {}
-            job_info['minute'] = str(job.minute)
-            job_info['hour'] = str(job.hour)
-            job_info['dow'] = str(job.dow)
-            alarms.append(job_info)
+    alarms = get_alarms_list()
 
     return jsonify({ 'alarms' : alarms }), 201
 
@@ -239,22 +242,42 @@ def deleteAlarm(minute, hour, days):
     comment = createCronComment(minute, hour, days)
     print(comment)
     cron = CronTab(user=True)
+    ret = False
     for job in cron.find_comment(comment):
-        print(job)
         cron.remove(job)
+        ret = True
             
     cron.write()
 
-    return True
+    return ret
 
 def createCronComment(minute, hour, days):
-	comment = 'ls_server_'
-        comment += str(minute)
-        comment += '_'
-        comment += str(hour)
-        comment += '_'
-        comment += str(days)
-	return comment
+    comment = 'ls_server_'
+    comment += str(minute)
+    comment += '_'
+    comment += str(hour)
+    comment += '_'
+    comment += str(days)
+    return comment
+
+def get_alarms_list():
+    alarms = []
+    cron = CronTab(user=True)
+    for job in cron:
+        if 'ls_server' in job.comment:
+            job_info = {}
+            job_info['minute'] = str(job.minute)
+            job_info['hour'] = str(job.hour)
+            job_info['dow'] = str(job.dow)
+            if 'id=' in job.comment:
+                id = job.comment
+                id = id[id.find("id=") + 3:]
+                job_info['id'] = int(id)
+            else:
+                job_info['id'] = -1
+            alarms.append(job_info)
+
+    return alarms
 
 def createPidFile():
 	pidFile = open(pidFileName, 'w')
