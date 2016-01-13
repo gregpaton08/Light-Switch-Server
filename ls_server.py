@@ -147,7 +147,7 @@ def post_alarms():
 
     alarm['id'] = id
 
-    if setAlarm('on', alarm['minute'], alarm['hour'], alarm['dow']):
+    if setAlarm('on', alarm['minute'], alarm['hour'], alarm['dow'], id):
         return jsonify({ 'alarms' : alarm }), 201
     else:
         return jsonify({'error' : 'unable to set alarm'}), 400
@@ -176,7 +176,7 @@ def delete_alarms():
 
     alarm = alarm[0]
 
-    if deleteAlarm(alarm['minute'], alarm['hour'], alarm['dow']):
+    if deleteAlarm(id):
         return jsonify({ 'alarms' : alarm }), 201
     else:
         return jsonify({'error' : 'unable to delete alarm'}), 400
@@ -211,9 +211,10 @@ def setChannelHigh(channel):
 # minute: 0 tp 59
 # hour: 0 to 23
 # days: 0 is Sunday, 6 is Saturday. Comma separated list for multiple days.
-def setAlarm(state, minute, hour, days):
+# id is the unique identifier of the alarm (used in the comment).
+def setAlarm(state, minute, hour, days, id):
 	if state == 'on':
-		comment = createCronComment(minute, hour, days)
+		comment = createCronComment(minute, hour, days, id)
 		# If alarm already exists return True
 		cron = CronTab(user=True)
 		iter = cron.find_comment(comment)
@@ -245,26 +246,32 @@ def setAlarm(state, minute, hour, days):
 		# Error handling
 		return False
 
-def deleteAlarm(minute, hour, days):
-    comment = createCronComment(minute, hour, days)
-    print(comment)
+def deleteAlarm(id):
     cron = CronTab(user=True)
     ret = False
-    for job in cron.find_comment(comment):
-        cron.remove(job)
-        ret = True
+    for job in cron:
+        comment = job.comment
+        if 'ls_server' in comment:
+            comment = comment[comment.find('id=') + 3:]
+            if id == int(comment):
+                cron.remove(job)
+                ret = True
+                break
             
     cron.write()
 
     return ret
 
-def createCronComment(minute, hour, days):
+def createCronComment(minute, hour, days, id):
     comment = 'ls_server_'
     comment += str(minute)
     comment += '_'
     comment += str(hour)
     comment += '_'
     comment += str(days)
+    comment += '_'
+    comment += 'id='
+    comment += str(id)
     return comment
 
 def get_alarms_list():
