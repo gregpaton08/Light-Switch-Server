@@ -130,11 +130,16 @@ def post_alarms():
         return jsonify({'error' : 'no json found'}), 400
 
     alarm = {
+        'user'   : request.json.get('user', None),
         'action' : request.json.get('action', u''),
         'minute' : request.json.get('minute',   u''),
         'hour'   : request.json.get('hour', u''),
         'dow'    : request.json.get('dow', u''),
     }
+
+    for key, value in alarm.iteritems():
+        if value is None:
+            return jsonify({'error' : 'JSON is missing entry for ' + key}), 400
 
     alarms = get_alarms_list()
     id = 0
