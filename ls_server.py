@@ -102,27 +102,6 @@ def light_off():
 def light_auth():
     return render_template('main.html')
 
-@app.route("/set_alarm", methods=['GET', 'POST'])
-def set_alarm():
-    state = request.args.get('state', '')
-    minute = request.args.get('minute', '')
-    hour   = request.args.get('hour', '')
-    days   = request.args.get('days', '')
-    if setAlarm(state, minute, hour, days):
-        dayNums = days.split(",")
-        dayList = []
-        for i in dayNums:
-            dayList.append(DAYS_OF_WEEK[int(i)])
-        print dayList
-        templateData = {
-            'minute' : minute,
-            'hour' : str(int(hour) % 12),
-            'AMPM' : 'PM' if int(hour) > 12 else 'AM',
-            'days' : dayList
-        }
-        return render_template('alarm_set.html', **templateData)
-    else:
-        return render_template('alarm_fail.html')
 
 @app.route("/alarms", methods=['POST'])
 def post_alarms():
