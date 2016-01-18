@@ -138,11 +138,13 @@ def post_alarms():
     else:
         return jsonify({'error' : 'unable to set alarm: ' + error}), 400
 
+
 @app.route("/alarms", methods=['GET'])
 def get_alarms():
     alarms = get_alarms_list()
 
     return jsonify({ 'alarms' : alarms }), 201
+
 
 @app.route("/alarms", methods=['DELETE'])
 def delete_alarms():
@@ -231,6 +233,7 @@ def deleteAlarm(id):
 
     return ret
 
+
 def create_cron_comment(user, action, minute, hour, days, id):
     comment = 'ls_server'
     comment += '_user='   + user
@@ -240,6 +243,7 @@ def create_cron_comment(user, action, minute, hour, days, id):
     comment += '_days='   + str(days)
     comment += '_id='     + str(id)
     return comment
+
 
 def get_alarms_list():
     alarms = []
@@ -260,16 +264,19 @@ def get_alarms_list():
 
     return alarms
 
+
 def createPidFile():
 	pidFile = open(pidFileName, 'w')
 	pidFile.write(str(os.getpid()))
 	pidFile.close()
+
 
 def deletePidFile():
 	try:
                 os.remove(pidFileName)
         except OSError:
                 pass
+
 
 # Handle kill signal from OS
 def signal_term_handler(signal, frame):
@@ -285,6 +292,6 @@ if __name__ == "__main__":
 		createPidFile()
 		app.run(host='0.0.0.0', port=_PORT, debug=DEBUG)
 	except KeyboardInterrupt:
-		deletePidFile()
+		pass
 	deletePidFile()
 	print 'light switch server shutting down...'
