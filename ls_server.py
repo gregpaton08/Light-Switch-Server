@@ -131,10 +131,10 @@ def post_alarms():
 
     alarm = {
         'user'   : request.json.get('user', None),
-        'action' : request.json.get('action', u''),
-        'minute' : request.json.get('minute',   u''),
-        'hour'   : request.json.get('hour', u''),
-        'dow'    : request.json.get('dow', u''),
+        'action' : request.json.get('action', None),
+        'minute' : request.json.get('minute', None),
+        'hour'   : request.json.get('hour', None),
+        'dow'    : request.json.get('dow', None),
     }
 
     for key, value in alarm.iteritems():
@@ -153,10 +153,11 @@ def post_alarms():
 
     alarm['id'] = id
 
-    if setAlarm(alarm['action'], alarm['minute'], alarm['hour'], alarm['dow'], id):
+    ret, error = create_alarm(alarm['user'], alarm['action'], alarm['minute'], alarm['hour'], alarm['dow'], id)
+    if ret:
         return jsonify({ 'alarms' : alarm }), 201
     else:
-        return jsonify({'error' : 'unable to set alarm'}), 400
+        return jsonify({'error' : 'unable to set alarm: ' + error}), 400
 
 @app.route("/alarms", methods=['GET'])
 def get_alarms():
@@ -187,23 +188,6 @@ def delete_alarms():
     else:
         return jsonify({'error' : 'unable to delete alarm'}), 400
 
-@app.route("/delete_alarm", methods=['GET', 'POST'])
-def delete_alarm():
-    minute = request.args.get('minute', '')
-    hour   = request.args.get('hour', '')
-    days   = request.args.get('days', '')
-    deleteAlarm(minute, hour, days)
-    dayNums = days.split(",")
-    dayList = []
-    for i in dayNums:
-        dayList.append(DAYS_OF_WEEK[int(i)])
-        templateData = {
-                'minute' : minute,
-                'hour' : str(int(hour) % 12),
-                'AMPM' : 'PM' if int(hour) > 12 else 'AM',
-                'days' : dayList
-        }
-        return render_template('alarm_delete.html', **templateData)
 
 def setChannelHigh(channel):
     GPIO.setmode(GPIO.BCM)
@@ -213,13 +197,14 @@ def setChannelHigh(channel):
     GPIO.output(channel, GPIO.LOW)
     GPIO.cleanup(channel)
 
+
 # action: 'on' to create an alarm that turns device on or 'off' to turn device off it.
 # minute: 0 tp 59
 # hour: 0 to 23
 # days: 0 is Sunday, 6 is Saturday. Comma separated list for multiple days.
 # id is the unique identifier of the alarm (used in the comment).
-def setAlarm(action, minute, hour, days, id):
-    comment = createCronComment(minute, hour, days, id)
+def create_alarm(user, action, minute, hour, days, id):
+    comment = create_cron_comment(user, action, minute, hour, days, id)
     # If alarm already exists return True
     cron = CronTab(user=True)
     iter = cron.find_comment(comment)
@@ -228,7 +213,7 @@ def setAlarm(action, minute, hour, days, id):
         if len(job) > 0:
             if DEBUG:
                 print job
-            return True
+            return True, 'alarm already exists'
     except StopIteration:
         pass
     # print comment
@@ -237,7 +222,7 @@ def setAlarm(action, minute, hour, days, id):
     elif action == 'off':
         job = cron.new(command='/home/pi/projects/light_switch/light_off.py')
     else:
-        return False
+        return False, 'Invalid action ' + action
     job.set_comment(comment)
     job.minute.on(minute)
     job.hour.on(hour)
@@ -247,9 +232,9 @@ def setAlarm(action, minute, hour, days, id):
         print job
     if job.is_valid():
         cron.write()
-        return True
+        return True, 'success'
     else:
-        return False
+        return False, 'Invalid cron job ' + str(job)
 
 
 def deleteAlarm(id):
@@ -268,16 +253,14 @@ def deleteAlarm(id):
 
     return ret
 
-def createCronComment(minute, hour, days, id):
-    comment = 'ls_server_'
-    comment += str(minute)
-    comment += '_'
-    comment += str(hour)
-    comment += '_'
-    comment += str(days)
-    comment += '_'
-    comment += 'id='
-    comment += str(id)
+def create_cron_comment(user, action, minute, hour, days, id):
+    comment = 'ls_server'
+    comment += '_user='   + user
+    comment += '_action=' + action
+    comment += '_minute=' + str(minute)
+    comment += '_hour='   + str(hour)
+    comment += '_days='   + str(days)
+    comment += '_id='     + str(id)
     return comment
 
 def get_alarms_list():
