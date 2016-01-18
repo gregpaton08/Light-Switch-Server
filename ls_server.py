@@ -244,10 +244,9 @@ def deleteAlarm(id):
         comment = job.comment
         if 'ls_server' in comment:
             comment = comment[comment.find('id=') + 3:]
-            if id == int(comment):
+            if int(id) == int(comment):
                 cron.remove(job)
                 ret = True
-                break
             
     cron.write()
 
