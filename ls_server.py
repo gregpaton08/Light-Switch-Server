@@ -130,6 +130,7 @@ def post_alarms():
         return jsonify({'error' : 'no json found'}), 400
 
     alarm = {
+        'action' : request.json.get('action', u''),
         'minute' : request.json.get('minute',   u''),
         'hour'   : request.json.get('hour', u''),
         'dow'    : request.json.get('dow', u''),
@@ -147,7 +148,7 @@ def post_alarms():
 
     alarm['id'] = id
 
-    if setAlarm('on', alarm['minute'], alarm['hour'], alarm['dow'], id):
+    if setAlarm(alarm['action'], alarm['minute'], alarm['hour'], alarm['dow'], id):
         return jsonify({ 'alarms' : alarm }), 201
     else:
         return jsonify({'error' : 'unable to set alarm'}), 400
@@ -207,44 +208,44 @@ def setChannelHigh(channel):
     GPIO.output(channel, GPIO.LOW)
     GPIO.cleanup(channel)
 
-# state: 'on' to create an alarm or 'off' to delete it.
+# action: 'on' to create an alarm that turns device on or 'off' to turn device off it.
 # minute: 0 tp 59
 # hour: 0 to 23
 # days: 0 is Sunday, 6 is Saturday. Comma separated list for multiple days.
 # id is the unique identifier of the alarm (used in the comment).
-def setAlarm(state, minute, hour, days, id):
-	if state == 'on':
-		comment = createCronComment(minute, hour, days, id)
-		# If alarm already exists return True
-		cron = CronTab(user=True)
-		iter = cron.find_comment(comment)
-		try:
-			job = iter.next()
-			if len(job) > 0:
-				if DEBUG:
-					print job
-				return True
-		except StopIteration:
-			pass
-		#print comment
-		job = cron.new(command='/home/pi/projects/light_switch/light_on.py')
-		job.set_comment(comment)
-		job.minute.on(minute)
-		job.hour.on(hour)
-		daysList = days.split(",")
-		job.dow.on(*daysList)
-		if DEBUG:
-			print job
-		if job.is_valid():
-			cron.write()
-			return True
-		else:
-			return False
-	elif state == 'off':
-		pass
-	else:
-		# Error handling
-		return False
+def setAlarm(action, minute, hour, days, id):
+    comment = createCronComment(minute, hour, days, id)
+    # If alarm already exists return True
+    cron = CronTab(user=True)
+    iter = cron.find_comment(comment)
+    try:
+        job = iter.next()
+        if len(job) > 0:
+            if DEBUG:
+                print job
+            return True
+    except StopIteration:
+        pass
+    # print comment
+    if action == 'on':
+        job = cron.new(command='/home/pi/projects/light_switch/light_on.py')
+    elif action == 'off':
+        job = cron.new(command='/home/pi/projects/light_switch/light_off.py')
+    else:
+        return False
+    job.set_comment(comment)
+    job.minute.on(minute)
+    job.hour.on(hour)
+    daysList = days.split(",")
+    job.dow.on(*daysList)
+    if DEBUG:
+        print job
+    if job.is_valid():
+        cron.write()
+        return True
+    else:
+        return False
+
 
 def deleteAlarm(id):
     cron = CronTab(user=True)
