@@ -120,6 +120,7 @@ def post_alarms():
         if value is None:
             return jsonify({'error' : 'JSON is missing entry for ' + key}), 400
 
+    # find the next available alarm id
     alarms = get_alarms_list()
     id = 0
     sorted_alarms = sorted(alarms, key=lambda k: k['id']) 
@@ -129,14 +130,13 @@ def post_alarms():
             id = id + 1
         else:
             break;
-
     alarm['id'] = id
 
     ret, error = create_alarm(alarm['user'], alarm['action'], alarm['minute'], alarm['hour'], alarm['dow'], id)
     if ret:
         return jsonify({ 'alarms' : alarm }), 201
-    else:
-        return jsonify({'error' : 'unable to set alarm: ' + error}), 400
+    
+    return jsonify({'error' : 'unable to set alarm: ' + error}), 400
 
 
 @app.route("/alarms", methods=['GET'])
