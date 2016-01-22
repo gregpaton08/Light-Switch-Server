@@ -31,11 +31,23 @@ DAYS_OF_WEEK = [
 _URL_ROUTE = '/switches/API/v1.0/switches'
 
 
-def turn_light_on(turnOn):
+
+# Toggles a GPIO channel from low to high
+def toggle_gpio_channel(channel, seconds = 2):
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(channel, GPIO.OUT)
+    GPIO.output(channel, GPIO.HIGH)
+    time.sleep(seconds)
+    GPIO.output(channel, GPIO.LOW)
+    GPIO.cleanup(channel)
+
+
+def set_light_status(on):
     channel = CHANNEL_OFF
-    if turnOn:
+    if on:
         channel = CHANNEL_ON
-    thread.start_new_thread(setChannelHigh, (channel,) )
+    thread.start_new_thread(toggle_gpio_channel, (channel,) )
+
 
 @app.route(_URL_ROUTE, methods=['POST'])
 def add_switch():
@@ -51,15 +63,18 @@ def add_switch():
 
     return jsonify({'switch': switch}), 201
 
+
 @app.route(_URL_ROUTE + '/<int:switch_id>', methods=['DELETE'])
 def delete_switch(switch_id):
     lsswitches.delete_switch(switch_id)
     return jsonify({'result': True})
 
+
 @app.route(_URL_ROUTE, methods=['GET'])
 def route():
     switches = lsswitches.get_switches()
     return jsonify({'switches' : switches})
+
 
 @app.route(_URL_ROUTE + '/<int:switch_id>', methods=['PUT'])
 def update_switch(switch_id):
@@ -80,22 +95,26 @@ def update_switch(switch_id):
     
     return jsonify({'switch': switch[0]})
 
+
 @app.route("/")
 @lsauth.requires_auth
 def light_main():
 	return render_template('main.html')
 
+
 @app.route("/light_on")
 @lsauth.requires_auth
 def light_on():
-    thread.start_new_thread(setChannelHigh, (CHANNEL_ON,) )
+    thread.start_new_thread(set_light_status, (True,) )
     return render_template('main.html')
-	
+
+
 @app.route("/light_off")
 @lsauth.requires_auth
 def light_off():
-    thread.start_new_thread(setChannelHigh, (CHANNEL_OFF,) )
+    thread.start_new_thread(set_light_status, (False,) )
     return render_template('main.html')
+
 
 @app.route("/light_auth")
 @lsauth.requires_auth
@@ -168,15 +187,6 @@ def delete_alarms():
         return jsonify({ 'alarms' : alarm }), 201
     else:
         return jsonify({'error' : 'unable to delete alarm'}), 400
-
-
-def setChannelHigh(channel):
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(channel, GPIO.OUT)
-    GPIO.output(channel, GPIO.HIGH)
-    time.sleep(2)
-    GPIO.output(channel, GPIO.LOW)
-    GPIO.cleanup(channel)
 
 
 # action: 'on' to create an alarm that turns device on or 'off' to turn device off it.
@@ -272,17 +282,18 @@ def createPidFile():
 
 
 def deletePidFile():
-	try:
-                os.remove(pidFileName)
-        except OSError:
-                pass
+    try:
+        os.remove(pidFileName)
+    except OSError:
+        pass
 
 
 # Handle kill signal from OS
 def signal_term_handler(signal, frame):
-	print 'light switch server killed'
-	deletePidFile()
-	sys.exit(0)
+    print 'light switch server killed'
+    deletePidFile()
+    sys.exit(0)
+
 
 signal.signal(signal.SIGTERM, signal_term_handler)
 
