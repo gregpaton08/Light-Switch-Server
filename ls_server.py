@@ -86,11 +86,10 @@ def update_switch(switch_id):
         print('NO JSON ==================')
         abort(400)
     if 'status' in request.json:
-        pass
         if type(request.json['status']) is not bool:
             abort(400)
         else:
-            turn_light_on(request.json['status'])
+            set_light_status(request.json['status'])
     switch[0]['status'] = request.json.get('status', switch[0]['status'])
     
     return jsonify({'switch': switch[0]})
@@ -183,7 +182,7 @@ def delete_alarms():
 
     alarm = alarm[0]
 
-    if deleteAlarm(id):
+    if delete_alarm(id):
         return jsonify({ 'alarms' : alarm }), 201
     else:
         return jsonify({'error' : 'unable to delete alarm'}), 400
@@ -228,7 +227,7 @@ def create_alarm(user, action, minute, hour, days, id):
         return False, 'Invalid cron job ' + str(job)
 
 
-def deleteAlarm(id):
+def delete_alarm(id):
     cron = CronTab(user=True)
     ret = False
     for job in cron:
@@ -281,7 +280,7 @@ def createPidFile():
 	pidFile.close()
 
 
-def deletePidFile():
+def delete_pid_file():
     try:
         os.remove(pidFileName)
     except OSError:
@@ -291,7 +290,7 @@ def deletePidFile():
 # Handle kill signal from OS
 def signal_term_handler(signal, frame):
     print 'light switch server killed'
-    deletePidFile()
+    delete_pid_file()
     sys.exit(0)
 
 
@@ -304,5 +303,5 @@ if __name__ == "__main__":
 		app.run(host='0.0.0.0', port=_PORT, debug=DEBUG)
 	except KeyboardInterrupt:
 		pass
-	deletePidFile()
+	delete_pid_file ()
 	print 'light switch server shutting down...'
