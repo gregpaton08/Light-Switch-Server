@@ -105,14 +105,14 @@ def light_main():
 @app.route("/light_on")
 @lsauth.requires_auth
 def light_on():
-    thread.start_new_thread(set_light_status, (True,) )
+    set_light_status(True)
     return render_template('main.html')
 
 
 @app.route("/light_off")
 @lsauth.requires_auth
 def light_off():
-    thread.start_new_thread(set_light_status, (False,) )
+    set_light_status(False)
     return render_template('main.html')
 
 
