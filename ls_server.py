@@ -51,15 +51,17 @@ def set_light_status(on):
 
 @app.route(_URL_ROUTE, methods=['POST'])
 def add_switch():
+    # Make sure the request contains JSON
     if not request.json:
-        return jsonify({'error', 'no json found'}), 400
-    
+        return jsonify({'error' : 'no json found'}), 400
+
+    # Grab the relevant data from the request and add the new switch
     switch = {
         'room'   : request.json.get('room',   u''),
         'device' : request.json.get('device', u''),
         'status' : request.json.get('status', False),
     }
-    lsswitches.add_switch(switch)    
+    lsswitches.add_switch(switch)
 
     return jsonify({'switch': switch}), 201
 
@@ -80,10 +82,12 @@ def route():
 
 @app.route(_URL_ROUTE + '/<int:switch_id>', methods=['PUT'])
 def update_switch(switch_id):
+    # Get the switch
     switches = lsswitches.get_switches()
     switch = [switch for switch in switches if switch['id'] == switch_id]
     if 0 == len(switch):
-        abort(400)
+        return jsonify({'error' : 'no switch for id ' + str(switch_id)}), 400
+
     if not request.json:
         print('NO JSON ==================')
         abort(400)
