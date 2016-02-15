@@ -57,7 +57,14 @@ def delete_switch(id):
     if os.path.isfile(_LS_SWITCHES_DB_FILE):
         switches = pickle.load(open(_LS_SWITCHES_DB_FILE, "rb"))
         new_switches = [x for x in switches if id == x.get('id', -1)]
+        if len(switches) == len(new_switches):
+            return False
+        
         pickle.dump(new_switches, open(_LS_SWITCHES_DB_FILE, "wb"))
+
+        return True
+    
+    return False
                 
 
 if __name__ == '__main__':

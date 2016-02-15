@@ -66,8 +66,10 @@ def add_switch():
 
 @app.route(_URL_ROUTE + '/<int:switch_id>', methods=['DELETE'])
 def delete_switch(switch_id):
-    lsswitches.delete_switch(switch_id)
-    return jsonify({'result': True})
+    if lsswitches.delete_switch(switch_id):
+        return jsonify({'result': True})
+
+    return jsonify({'error' : 'no switch for id ' + str(switch_id)}), 400
 
 
 @app.route(_URL_ROUTE, methods=['GET'])
