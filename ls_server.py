@@ -99,18 +99,20 @@ def update_switch(switch_id):
 def toggle_switch(switch_id):
     switches = lsswitches.get_switches()
     switch = [switch for switch in switches if switch['id'] == switch_id]
-    if 0 == len(switch):
-        abort(400)
+    if 1 != len(switch):
+        return jsonify({'error' : 'switch with id ' + str(switch_id) + ' does not exist'}), 400
+    switch = switch[0]
 
     # Toggle the switch status
-    switch[0]['status'] = not switch[0]['status']
+    switch['status'] = not switch['status']
 
     # Update the light status
-    set_light_status(switch[0]['status'])
+    set_light_status(switch['status'])
 
-    lsswitches.update_switch(switch[0])
+    if not lsswitches.update_switch(switch):
+        return jsonify({'error' : 'switch with id ' + str(switch_id) + ' does not exist'}), 400
 
-    return jsonify({'switch' : switch[0]})
+    return jsonify({'switch' : switch})
 
 @app.route("/")
 @lsauth.requires_auth
