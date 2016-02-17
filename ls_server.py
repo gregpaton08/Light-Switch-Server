@@ -89,7 +89,6 @@ def update_switch(switch_id):
         return jsonify({'error' : 'no switch for id ' + str(switch_id)}), 400
 
     if not request.json:
-        print('NO JSON ==================')
         abort(400)
     if 'status' in request.json:
         if type(request.json['status']) is not bool:
@@ -98,8 +97,19 @@ def update_switch(switch_id):
             set_light_status(request.json['status'])
     switch[0]['status'] = request.json.get('status', switch[0]['status'])
     
-    return jsonify({'switch': switch[0]})
+    return jsonify({'switch': switch[0]}), 201
 
+
+@app.route(_URL_ROUTE + '/<int:switch_id>/status', methods=['GET'])
+def get_switch_status(switch_id):
+    # Get the switch
+    switches = lsswitches.get_switches()
+    switch = [switch for switch in switches if switch['id'] == switch_id]
+    if 0 == len(switch):
+        return jsonify({'error' : 'no switch for id ' + str(switch_id)}), 400
+    switch = switch[0]
+
+    return jsonify({'status' : switch['status']}), 201
 
 @app.route(_URL_ROUTE + '/<int:switch_id>/toggle', methods=['PUT'])
 def toggle_switch(switch_id):
