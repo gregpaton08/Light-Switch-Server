@@ -1,10 +1,46 @@
 <!DOCTYPE html>
+<html>
 <head>
     <title>Light Switch</title>
+    <link href="templates/css/main.css" type="text/css" rel="stylesheet"/>
+    <style type="text/css">
+        body {
+            font-family: monospace;
+        }
+        table {
+            margin: 0 auto;
+            margin-top: 200px;
+            vertical-align: middle;
+            border-spacing: 50px;
+/*            table-layout: fixed;*/
+        }
+        td {
+            border: 5px solid;
+            font-size: 100pt;
+            padding: 10px;
+            text-align: center;
+        }
+        a {
+            text-decoration: none;
+        }
+        td:hover {
+            background-color: blueviolet;
+        }
+        .on {
+            color: dodgerblue;
+        }
+        .off {
+            color: orange;
+        }
+    </style>
 </head>
 
 <body>
-    <a href="/light_on">turn on</a>
-    <a href="/light_off">turn off</a>
+    <table class="switches">
+        <tr>
+            <td><a class="on" href="/light_on">on</a></td>
+            <td><a  class="off" href="/light_off">off</a></td>
+        </tr>
+    </table>
 </body>
 </html>
