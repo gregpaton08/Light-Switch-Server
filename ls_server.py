@@ -3,7 +3,7 @@
 from flask import Flask, render_template, request, jsonify, abort, make_response
 import RPi.GPIO as GPIO
 import time
-import thread
+from threading import Thread
 import os
 from crontab import CronTab
 import signal
@@ -18,14 +18,14 @@ _PORT = 3333
 DEBUG = True
 pidFileName = 'ls_server_pid'
 DAYS_OF_WEEK = [
-	'Sunday',
-	'Monday',
-	'Tuesday',
-	'Wednesday',
-	'Thursday',
-	'Friday',
-	'Saturday',
-	'Sunday'
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday'
 ]
 
 _URL_ROUTE = '/switches/API/v1.0/switches'
@@ -33,7 +33,7 @@ _URL_ROUTE = '/switches/API/v1.0/switches'
 
 
 # Toggles a GPIO channel from low to high
-def toggle_gpio_channel(channel, seconds = 2):
+def toggle_gpio_channel(channel, seconds = 1):
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(channel, GPIO.OUT)
     GPIO.output(channel, GPIO.HIGH)
@@ -41,12 +41,20 @@ def toggle_gpio_channel(channel, seconds = 2):
     GPIO.output(channel, GPIO.LOW)
     GPIO.cleanup(channel)
 
+_light_control_thread = None
 
 def set_light_status(on):
+    global _light_control_thread
+
     channel = ls.GPIO_LIGHT_OFF
     if on:
         channel = ls.GPIO_LIGHT_ON
-    thread.start_new_thread(toggle_gpio_channel, (channel,) )
+
+    # thread.start_new_thread(toggle_gpio_channel, (channel,) )
+    if _light_control_thread is not None and _light_control_thread.is_alive():
+        _light_control_thread.join()
+    _light_control_thread = Thread(target=toggle_gpio_channel, args=(channel,))
+    _light_control_thread.start()
 
 
 @app.route(_URL_ROUTE, methods=['POST'])
@@ -133,7 +141,7 @@ def toggle_switch(switch_id):
 @app.route("/")
 @lsauth.requires_auth
 def light_main():
-	return render_template('main.html')
+    return render_template('main.html')
 
 
 @app.route("/light_on")
@@ -310,9 +318,9 @@ def get_alarms_list():
 
 
 def createPidFile():
-	pidFile = open(pidFileName, 'w')
-	pidFile.write(str(os.getpid()))
-	pidFile.close()
+    pidFile = open(pidFileName, 'w')
+    pidFile.write(str(os.getpid()))
+    pidFile.close()
 
 
 def delete_pid_file():
@@ -333,10 +341,14 @@ signal.signal(signal.SIGTERM, signal_term_handler)
 
 
 if __name__ == "__main__":
-	try:
-		createPidFile()
-		app.run(host='0.0.0.0', port=_PORT, debug=DEBUG)
-	except KeyboardInterrupt:
-		pass
-	delete_pid_file ()
-	print 'light switch server shutting down...'
+    try:
+        createPidFile()
+        app.run(host='0.0.0.0', port=_PORT, debug=DEBUG)
+    except KeyboardInterrupt:
+        pass
+
+    if _light_control_thread is not None:
+        _light_control_thread.join()
+
+    delete_pid_file ()
+    print 'light switch server shutting down...'
