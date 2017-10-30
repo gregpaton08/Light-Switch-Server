@@ -10,12 +10,12 @@ import signal
 import sys
 import lsauth
 import lsswitches
+import ls
+
 app = Flask(__name__)
 
 _PORT = 3333
 DEBUG = True
-CHANNEL_ON = 17
-CHANNEL_OFF = 23
 pidFileName = 'ls_server_pid'
 DAYS_OF_WEEK = [
 	'Sunday',
@@ -43,9 +43,9 @@ def toggle_gpio_channel(channel, seconds = 2):
 
 
 def set_light_status(on):
-    channel = CHANNEL_OFF
+    channel = ls.GPIO_LIGHT_OFF
     if on:
-        channel = CHANNEL_ON
+        channel = ls.GPIO_LIGHT_ON
     thread.start_new_thread(toggle_gpio_channel, (channel,) )
 
 
