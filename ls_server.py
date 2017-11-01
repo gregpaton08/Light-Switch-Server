@@ -3,6 +3,7 @@
 from flask import Flask, render_template, request, jsonify, abort, make_response
 import RPi.GPIO as GPIO
 import time
+import lightswitch
 from threading import Thread
 import os
 from crontab import CronTab
@@ -13,6 +14,8 @@ import lsswitches
 import ls
 
 app = Flask(__name__)
+
+light_switch = lightswitch.LightSwitch()
 
 _PORT = 3333
 DEBUG = True
@@ -29,33 +32,6 @@ DAYS_OF_WEEK = [
 ]
 
 _URL_ROUTE = '/switches/API/v1.0/switches'
-
-
-
-# Toggles a GPIO channel from low to high
-def toggle_gpio_channel(channel, seconds = 1):
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(channel, GPIO.OUT)
-    GPIO.output(channel, GPIO.HIGH)
-    time.sleep(seconds)
-    GPIO.output(channel, GPIO.LOW)
-    GPIO.cleanup(channel)
-
-_light_control_thread = None
-
-def set_light_status(on):
-    global _light_control_thread
-
-    channel = ls.GPIO_LIGHT_OFF
-    if on:
-        channel = ls.GPIO_LIGHT_ON
-
-    # thread.start_new_thread(toggle_gpio_channel, (channel,) )
-    if _light_control_thread is not None and _light_control_thread.is_alive():
-        _light_control_thread.join()
-    _light_control_thread = Thread(target=toggle_gpio_channel, args=(channel,))
-    _light_control_thread.start()
-
 
 @app.route(_URL_ROUTE, methods=['POST'])
 def add_switch():
@@ -102,7 +78,7 @@ def update_switch(switch_id):
         if type(request.json['status']) is not bool:
             abort(400)
         else:
-            set_light_status(request.json['status'])
+            light_switch.set_light(request.json['status'])
     switch[0]['status'] = request.json.get('status', switch[0]['status'])
     
     return jsonify({'switch': switch[0]}), 201
@@ -131,7 +107,7 @@ def toggle_switch(switch_id):
     switch['status'] = not switch['status']
 
     # Update the light status
-    set_light_status(switch['status'])
+    light_switch.set_light(switch['status'])
 
     if not lsswitches.update_switch(switch):
         return jsonify({'error' : 'switch with id ' + str(switch_id) + ' does not exist'}), 400
@@ -147,14 +123,14 @@ def light_main():
 @app.route("/light_on")
 @lsauth.requires_auth
 def light_on():
-    set_light_status(True)
+    light_switch.set_light(True)
     return render_template('main.html')
 
 
 @app.route("/light_off")
 @lsauth.requires_auth
 def light_off():
-    set_light_status(False)
+    light_switch.set_light(False)
     return render_template('main.html')
 
 
@@ -347,8 +323,7 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         pass
 
-    if _light_control_thread is not None:
-        _light_control_thread.join()
+    GPIO.cleanup()
 
     delete_pid_file ()
     print 'light switch server shutting down...'
