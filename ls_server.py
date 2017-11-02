@@ -12,6 +12,7 @@ import sys
 import lsauth
 import lsswitches
 import ls
+import pidfile
 
 app = Flask(__name__)
 
@@ -19,7 +20,7 @@ light_switch = lightswitch.LightSwitch()
 
 _PORT = 3333
 DEBUG = True
-pidFileName = 'ls_server_pid'
+pid_file_name = 'ls_server_pid'
 DAYS_OF_WEEK = [
     'Sunday',
     'Monday',
@@ -293,19 +294,6 @@ def get_alarms_list():
     return alarms
 
 
-def createPidFile():
-    pidFile = open(pidFileName, 'w')
-    pidFile.write(str(os.getpid()))
-    pidFile.close()
-
-
-def delete_pid_file():
-    try:
-        os.remove(pidFileName)
-    except OSError:
-        pass
-
-
 # Handle kill signal from OS
 def signal_term_handler(signal, frame):
     print 'light switch server killed'
@@ -317,13 +305,13 @@ signal.signal(signal.SIGTERM, signal_term_handler)
 
 
 if __name__ == "__main__":
+    pid_file = pidfile.PidFile(pid_file_name)
+
     try:
-        createPidFile()
         app.run(host='0.0.0.0', port=_PORT, debug=DEBUG)
     except KeyboardInterrupt:
         pass
 
     GPIO.cleanup()
-
-    delete_pid_file ()
+    pid_file.cleanup()
     print 'light switch server shutting down...'
