@@ -16,9 +16,15 @@ import pidfile
 from flask_restful import Resource, Api
 import json
 
-app = Flask(__name__)
 
+_PORT = 3333
+DEBUG = True
+pid_file_name = 'ls_server_pid'
+
+
+app = Flask(__name__)
 api = Api(app)
+
 
 _API_URL_ROUTE = '/api/v1.0/'
 
@@ -39,33 +45,24 @@ class LightSwitchAPI(Resource):
 
 api.add_resource(LightSwitchAPI, _API_URL_ROUTE + 'light_status')
 
-
-_PORT = 3333
-DEBUG = True
-pid_file_name = 'ls_server_pid'
-
 @app.route("/")
-@lsauth.requires_auth
 def light_main():
     return render_template('main.html')
 
 
 @app.route("/light_on")
-@lsauth.requires_auth
 def light_on():
     light_switch.set_light(True)
     return render_template('main.html')
 
 
 @app.route("/light_off")
-@lsauth.requires_auth
 def light_off():
     light_switch.set_light(False)
     return render_template('main.html')
 
 
 @app.route("/light_auth")
-@lsauth.requires_auth
 def light_auth():
     return render_template('main.html')
 
