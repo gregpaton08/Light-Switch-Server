@@ -29,8 +29,8 @@ class LightSwitchAPI(Resource):
         self.light_switch = lightswitch.LightSwitch()
 
     def put(self):
-        # if not request.is_json:
-        #     return { 'message' : 'Data provided must be in JSON format.' }, 400
+        if not request.is_json:
+            return { 'message' : 'Data provided must be in JSON format.' }, 400
 
         data = json.loads(request.data)
         self.light_switch.set_light(data['status'])
