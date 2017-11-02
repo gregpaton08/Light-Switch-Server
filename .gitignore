@@ -2,3 +2,5 @@
 *.p
 ls_server_pid
 venv
+build
+crontest*
