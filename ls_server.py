@@ -48,18 +48,6 @@ def light_auth():
     return render_template('main.html')
 
 
-
-
-# Handle kill signal from OS
-def signal_term_handler(signal, frame):
-    print 'light switch server killed'
-    delete_pid_file()
-    sys.exit(0)
-
-
-signal.signal(signal.SIGTERM, signal_term_handler)
-
-
 if __name__ == "__main__":
     pid_file = pidfile.PidFile(pid_file_name)
 
