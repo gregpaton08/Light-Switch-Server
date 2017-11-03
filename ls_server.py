@@ -45,25 +45,9 @@ class LightSwitchAPI(Resource):
 
 api.add_resource(LightSwitchAPI, _API_URL_ROUTE + 'light_status')
 
+
 @app.route("/")
 def light_main():
-    return render_template('main.html')
-
-
-@app.route("/light_on")
-def light_on():
-    light_switch.set_light(True)
-    return render_template('main.html')
-
-
-@app.route("/light_off")
-def light_off():
-    light_switch.set_light(False)
-    return render_template('main.html')
-
-
-@app.route("/light_auth")
-def light_auth():
     return render_template('main.html')
 
 
