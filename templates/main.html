@@ -2,11 +2,37 @@
 <html>
 <head>
     <title>Light Switch</title>
+
+    <style type="text/css">
+        
+        .light-switch-buttons {
+            /*width: 800px;*/
+            height: 800px;
+            /*margin: 0 auto;*/
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .light-switch-buttons button {
+            width: 50%;
+            height: 100%;
+            font-size: 100px;
+        }
+
+        .light-switch-buttons button:hover {
+            background-color: blue;
+        }
+
+    </style>
+
 </head>
 
 <body>
-    <button type="button" value="true">on</button>
-    <button type="button" value="false">off</button>
+    <div class="light-switch-buttons">
+        <button type="button" value="true">on</button>
+        <button type="button" value="false">off</button>
+    </div>
 
     <script type="text/javascript" src="/static/jquery.js"></script>
     <script type="text/javascript" src="/static/main.js"></script>
