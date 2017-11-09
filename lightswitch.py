@@ -23,6 +23,9 @@ class LightSwitch:
         channel = self.gpio_pin_on if on else self.gpio_pin_off
         self.__toggle_gpio_channel(channel)
 
+    def cleanup(self):
+        GPIO.cleanup()
+
 
 if __name__ == '__main__':
     light = LightSwitch()
