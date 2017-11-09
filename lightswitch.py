@@ -1,4 +1,8 @@
-import RPi.GPIO as GPIO
+try:
+    import RPi.GPIO as GPIO
+except ImportError:
+    from gpiostubs import GPIO
+
 import time
 
 class LightSwitch:

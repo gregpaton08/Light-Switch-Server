@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from flask import Flask, render_template, request, jsonify, abort, make_response
-import RPi.GPIO as GPIO
 import time
 import lightswitch
 from threading import Thread
@@ -10,8 +9,6 @@ from crontab import CronTab
 import signal
 import sys
 import lsauth
-import lsswitches
-import ls
 import pidfile
 from flask_restful import Resource, Api
 import json
