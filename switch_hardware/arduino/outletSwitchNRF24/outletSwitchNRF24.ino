@@ -53,7 +53,6 @@ void loop(void)
     
     radio.read(receive_payload, len);
 
-    receive_payload[0] = '1';
     switch (receive_payload[0]) {
       case '0':
         digitalWrite(relayPin, HIGH);
@@ -64,6 +63,8 @@ void loop(void)
       case '2':
         if (digitalRead(relayPin) == HIGH) {
           receive_payload[0] = '0';
+        } else {
+          receive_payload[0] = '1';
         }
         break;
       default:
