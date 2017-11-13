@@ -33,26 +33,9 @@ const int role_pin = 5;
 //
 
 // Radio pipe addresses for the 2 nodes to communicate.
+const uint64_t writingPipe = 0xF0F0F0F0E1LL;
+const uint64_t readingPipe = 0xF0F0F0F0D2LL;
 const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
-
-//
-// Role management
-//
-// Set up role.  This sketch uses the same software for all the nodes
-// in this system.  Doing so greatly simplifies testing.  The hardware itself specifies
-// which node it is.
-//
-// This is done through the role_pin
-//
-
-// The various roles supported by this sketch
-typedef enum { role_ping_out = 1, role_pong_back } role_e;
-
-// The debug-friendly names of those roles
-const char* role_friendly_name[] = { "invalid", "Ping out", "Pong back"};
-
-// The role of the current running sketch
-role_e role;
 
 //
 // Payload
@@ -67,8 +50,6 @@ char receive_payload[max_payload_size + 1]; // +1 to allow room for a terminatin
 
 void setup(void)
 {
-  role = role_pong_back;
-
   Serial.begin(115200);
 
   radio.begin();
@@ -79,8 +60,8 @@ void setup(void)
   // optionally, increase the delay between retries & # of retries
   radio.setRetries(5, 15);
 
-  radio.openWritingPipe(pipes[0]);
-  radio.openReadingPipe(1, pipes[1]);
+  radio.openReadingPipe(1, readingPipe);
+  radio.openWritingPipe(writingPipe);
 
   radio.startListening();
   radio.printDetails();
