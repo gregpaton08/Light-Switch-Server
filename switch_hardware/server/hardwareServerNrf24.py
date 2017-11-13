@@ -70,12 +70,6 @@ def send_data(data):
 
 reading_pipe = 0xF0F0F0F0E1
 writing_pipe = 0xF0F0F0F0D2
-min_payload_size = 4
-max_payload_size = 32
-payload_size_increments_by = 4
-next_payload_size = 32
-inp_role = 'none'
-send_payload = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ789012'
 millis = lambda: int(round(time.time() * 1000))
 
 radio.begin()
