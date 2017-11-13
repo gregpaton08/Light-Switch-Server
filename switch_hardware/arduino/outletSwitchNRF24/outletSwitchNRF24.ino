@@ -69,19 +69,7 @@ void setup(void)
 {
   role = role_pong_back;
 
-  //
-  // Print preamble
-  //
-
   Serial.begin(115200);
-  
-  Serial.println(F("RF24/examples/pingpair_dyn/"));
-  Serial.print(F("ROLE: "));
-  Serial.println(role_friendly_name[role]);
-
-  //
-  // Setup and configure rf radio
-  //
 
   radio.begin();
 
