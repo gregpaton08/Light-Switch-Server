@@ -21,42 +21,79 @@ radio = RF24(22, 0);
 #irq_gpio_pin = RPI_BPLUS_GPIO_J8_18
 #irq_gpio_pin = 24
 
-##########################################
-def try_read_data(channel=0):
-    if radio.available():
-        while radio.available():
-            len = radio.getDynamicPayloadSize()
-            receive_payload = radio.read(len)
-            print('Got payload size={} value="{}"'.format(len, receive_payload.decode('utf-8')))
-            # First, stop listening so we can talk
-            radio.stopListening()
-
-            # Send the final one back.
-            radio.write(receive_payload)
-            print('Sent response.')
-
-            # Now, resume listening so we catch the next packets.
-            radio.startListening()
 
 reading_pipe = 0xF0F0F0F0E1
 writing_pipe = 0xF0F0F0F0D2
-min_payload_size = 4
-max_payload_size = 32
-payload_size_increments_by = 4
-next_payload_size = 32
-inp_role = 'none'
-send_payload = b'ABCDEFGHIJKLMNOPQRSTUVWXYZ789012'
 millis = lambda: int(round(time.time() * 1000))
 
-print('pyRF24/examples/pingpair_dyn/')
+
+def send_data(data):
+    # First, stop listening so we can talk.
+    radio.stopListening()
+
+    # Take the time, and send it.  This will block until complete
+    print('Now sending length {} ... '.format(data))
+    radio.write(bytes(data))
+
+    # Now, continue listening
+    radio.startListening()
+
+    # Wait here until we get a response, or timeout
+    started_waiting_at = millis()
+    timeout = False
+    while (not radio.available()) and (not timeout):
+        if (millis() - started_waiting_at) > 1000:
+            timeout = True
+
+    # Describe the results
+    if timeout:
+        print('failed, response timed out.')
+    else:
+        # Grab the response, compare, and send to debugging spew
+        len = radio.getDynamicPayloadSize()
+        receive_payload = radio.read(len)
+
+        # Spew it
+        print('got response size={} value="{}"'.format(len, receive_payload.decode('utf-8')))
+
+
+def get_switch_status():
+    """
+    Get the current status of the switch.
+
+    :returns: True if the switch is on and False if the switch is off.
+    :raises TimeoutError: Raises exception if the request times out.
+    """
+
+    radio.stopListening()
+    radio.write(bytes(2))
+    radio.startListening()
+
+    # Wait here until we get a response, or timeout.
+    started_waiting_at = millis()
+    timeout = False
+    while (not radio.available()) and (not timeout):
+        if (millis() - started_waiting_at) > 500:
+            timeout = True
+
+    # Describe the results
+    if timeout:
+        raise Exception('Status request timed out')
+    else:
+        # Grab the response, compare, and send to debugging spew
+        len = radio.getDynamicPayloadSize()
+        receive_payload = radio.read(len)
+
+        if receive_payload == "1":
+            return True
+        return False
+
+
 radio.begin()
 radio.enableDynamicPayloads()
-radio.setRetries(5,15)
+radio.setRetries(5, 15)
 radio.printDetails()
 
-print(' ************ Role Setup *********** ')
-
-print('Role: Pong Back, awaiting transmission')
 if irq_gpio_pin is not None:
     # set up callback for irq pin
     GPIO.setmode(GPIO.BCM)
@@ -69,14 +106,24 @@ radio.startListening()
 
 # forever loop
 while 1:
-    # Pong back role.  Receive each packet, dump it out, and send it back
+    command = input('enter number for command: ')
 
-    # if there is data ready
-    if irq_gpio_pin is None:
-        # no irq pin is set up -> poll it
-        try_read_data()
+    print("sending command {}".format(command))
+    if int(command) == 2:
+        try:
+            print(get_switch_status())
+        except:
+            print('request timed out')
     else:
-        # callback routine set for irq pin takes care for reading -
-        # do nothing, just sleeps in order not to burn cpu by looping
-        time.sleep(1000)
+        send_data(int(command))
+
+
+    # # if there is data ready
+    # if irq_gpio_pin is None:
+    #     # no irq pin is set up -> poll it
+    #     try_read_data()
+    # else:
+    #     # callback routine set for irq pin takes care for reading -
+    #     # do nothing, just sleeps in order not to burn cpu by looping
+    #     time.sleep(1000)
 
