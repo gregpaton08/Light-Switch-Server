@@ -57,6 +57,38 @@ def send_data(data):
         print('got response size={} value="{}"'.format(len, receive_payload.decode('utf-8')))
 
 
+def get_switch_status():
+    """
+    Get the current status of the switch.
+
+    :returns: True if the switch is on and False if the switch is off.
+    :raises TimeoutError: Raises exception if the request times out.
+    """
+
+    radio.stopListening()
+    radio.write(bytes(2))
+    radio.startListening()
+
+    # Wait here until we get a response, or timeout.
+    started_waiting_at = millis()
+    timeout = False
+    while (not radio.available()) and (not timeout):
+        if (millis() - started_waiting_at) > 500:
+            timeout = True
+
+    # Describe the results
+    if timeout:
+        raise Exception('Status request timed out')
+    else:
+        # Grab the response, compare, and send to debugging spew
+        len = radio.getDynamicPayloadSize()
+        receive_payload = radio.read(len)
+
+        if receive_payload == "1":
+            return True
+        return False
+
+
 radio.begin()
 radio.enableDynamicPayloads()
 radio.setRetries(5, 15)
@@ -76,8 +108,14 @@ radio.startListening()
 while 1:
     command = input('enter number for command: ')
 
-    print("sending command {}".format(int(command)))
-    send_data(int(command))
+    print("sending command {}".format(command))
+    if int(command) == 2:
+        try:
+            print(get_switch_status())
+        except:
+            print('request timed out')
+    else:
+        send_data(int(command))
 
 
     # # if there is data ready
