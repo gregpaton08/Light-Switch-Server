@@ -17,12 +17,10 @@ const uint64_t readingPipe = 0xF0F0F0F0D2LL;
 const int max_payload_size = 32;
 char receive_payload[max_payload_size + 1]; // +1 to allow room for a terminating NULL char
 
-const uint8_t relayPin = 8;
+const uint8_t relayPin = 8; // Setting to HIGH turns switch off, setting to LOW turns switch on.
 
 void setup(void)
 {
-  Serial.begin(115200);
-
   radio.begin();
 
   // enable dynamic payloads
@@ -55,15 +53,7 @@ void loop(void)
     
     radio.read(receive_payload, len);
 
-    // Put a zero at the end for easy printing.
-    receive_payload[len] = 0;
-
-    // Spew it
-    Serial.print(F("Got response size="));
-    Serial.print(len);
-    Serial.print(F(" value="));
-    Serial.println(receive_payload[0]);
-
+    receive_payload[0] = '1';
     switch (receive_payload[0]) {
       case '0':
         digitalWrite(relayPin, HIGH);
@@ -74,22 +64,15 @@ void loop(void)
       case '2':
         if (digitalRead(relayPin) == HIGH) {
           receive_payload[0] = '0';
-        } else {
-          receive_payload[0] = '1';
         }
         break;
       default:
         break;
     }
 
-    // First, stop listening so we can talk
+    // Send the response back
     radio.stopListening();
-
-    // Send the final one back.
     radio.write(receive_payload, len);
-    Serial.println(F("Sent response."));
-
-    // Now, resume listening so we catch the next packets.
     radio.startListening();
   }
 }
