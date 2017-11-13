@@ -17,6 +17,8 @@ const uint64_t readingPipe = 0xF0F0F0F0D2LL;
 const int max_payload_size = 32;
 char receive_payload[max_payload_size + 1]; // +1 to allow room for a terminating NULL char
 
+const uint8_t relayPin = 8;
+
 void setup(void)
 {
   Serial.begin(115200);
@@ -34,6 +36,9 @@ void setup(void)
 
   radio.startListening();
   radio.printDetails();
+
+  pinMode(relayPin, OUTPUT);
+  digitalWrite(relayPin, LOW);
 }
 
 void loop(void)
@@ -57,7 +62,25 @@ void loop(void)
     Serial.print(F("Got response size="));
     Serial.print(len);
     Serial.print(F(" value="));
-    Serial.println(receive_payload);
+    Serial.println(receive_payload[0]);
+
+    switch (receive_payload[0]) {
+      case '0':
+        digitalWrite(relayPin, HIGH);
+        break;
+      case '1':
+        digitalWrite(relayPin, LOW);
+        break;
+      case '2':
+        if (digitalRead(relayPin) == HIGH) {
+          receive_payload[0] = '0';
+        } else {
+          receive_payload[0] = '1';
+        }
+        break;
+      default:
+        break;
+    }
 
     // First, stop listening so we can talk
     radio.stopListening();
