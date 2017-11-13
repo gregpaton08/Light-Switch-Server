@@ -88,41 +88,35 @@ void setup(void)
 
 void loop(void)
 {
-  if ( role == role_pong_back )
+  while (radio.available())
   {
-    // if there is data ready
-    while ( radio.available() )
-    {
-
-      // Fetch the payload, and see if this was the last one.
-      uint8_t len = radio.getDynamicPayloadSize();
-      
-      // If a corrupt dynamic payload is received, it will be flushed
-      if(!len){
-        continue; 
-      }
-      
-      radio.read( receive_payload, len );
-
-      // Put a zero at the end for easy printing
-      receive_payload[len] = 0;
-
-      // Spew it
-      Serial.print(F("Got response size="));
-      Serial.print(len);
-      Serial.print(F(" value="));
-      Serial.println(receive_payload);
-
-      // First, stop listening so we can talk
-      radio.stopListening();
-
-      // Send the final one back.
-      radio.write( receive_payload, len );
-      Serial.println(F("Sent response."));
-
-      // Now, resume listening so we catch the next packets.
-      radio.startListening();
+    // Fetch the payload, and see if this was the last one.
+    uint8_t len = radio.getDynamicPayloadSize();
+    
+    // If a corrupt dynamic payload is received, it will be flushed.
+    if (!len) {
+      continue; 
     }
+    
+    radio.read(receive_payload, len);
+
+    // Put a zero at the end for easy printing.
+    receive_payload[len] = 0;
+
+    // Spew it
+    Serial.print(F("Got response size="));
+    Serial.print(len);
+    Serial.print(F(" value="));
+    Serial.println(receive_payload);
+
+    // First, stop listening so we can talk
+    radio.stopListening();
+
+    // Send the final one back.
+    radio.write( receive_payload, len );
+    Serial.println(F("Sent response."));
+
+    // Now, resume listening so we catch the next packets.
+    radio.startListening();
   }
 }
-// vim:cin:ai:sts=2 sw=2 ft=cpp
