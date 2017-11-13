@@ -21,22 +21,11 @@ radio = RF24(22, 0);
 #irq_gpio_pin = RPI_BPLUS_GPIO_J8_18
 #irq_gpio_pin = 24
 
-##########################################
-def try_read_data(channel=0):
-    if radio.available():
-        while radio.available():
-            len = radio.getDynamicPayloadSize()
-            receive_payload = radio.read(len)
-            print('Got payload size={} value="{}"'.format(len, receive_payload.decode('utf-8')))
-            # First, stop listening so we can talk
-            radio.stopListening()
 
-            # Send the final one back.
-            radio.write(receive_payload)
-            print('Sent response.')
+reading_pipe = 0xF0F0F0F0E1
+writing_pipe = 0xF0F0F0F0D2
+millis = lambda: int(round(time.time() * 1000))
 
-            # Now, resume listening so we catch the next packets.
-            radio.startListening()
 
 def send_data(data):
     # First, stop listening so we can talk.
@@ -67,10 +56,6 @@ def send_data(data):
         # Spew it
         print('got response size={} value="{}"'.format(len, receive_payload.decode('utf-8')))
 
-
-reading_pipe = 0xF0F0F0F0E1
-writing_pipe = 0xF0F0F0F0D2
-millis = lambda: int(round(time.time() * 1000))
 
 radio.begin()
 radio.enableDynamicPayloads()
