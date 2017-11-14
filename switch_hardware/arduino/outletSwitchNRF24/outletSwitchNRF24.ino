@@ -2,6 +2,9 @@
 #include "nRF24L01.h"
 #include "RF24.h"
 
+// IRQ is pin 7
+const uint8_t irqPin = 7;
+
 // Set up nRF24L01 radio on SPI bus plus pins 7 & 8
 
 RF24 radio(9, 10);
@@ -37,6 +40,8 @@ void setup(void)
 
   pinMode(relayPin, OUTPUT);
   digitalWrite(relayPin, LOW);
+
+  pinMode(irqPin, INPUT);
 }
 
 void loop(void)
