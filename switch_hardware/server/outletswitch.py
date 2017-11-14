@@ -1,0 +1,4 @@
+
+
+class OutletSwitch:
+    pass
