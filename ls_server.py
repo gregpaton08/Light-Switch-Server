@@ -31,6 +31,13 @@ class LightSwitchAPI(Resource):
     def __init__(self):
         self.switch = switch = server.outletswitch.OutletSwitch()
 
+    def get(self):
+        try:
+            return { 'status' : self.switch.get_status() }
+        except:
+            # TODO: handle/report error.
+            pass
+
     def put(self):
         if not request.is_json:
             return { 'message' : 'Data provided must be in JSON format.' }, 400
