@@ -12,6 +12,7 @@ import lsauth
 import pidfile
 from flask_restful import Resource, Api
 import json
+from switch_hardware import server
 
 
 _PORT = 3333
@@ -27,6 +28,8 @@ _API_URL_ROUTE = '/api/v1.0/'
 
 light_switch = lightswitch.LightSwitch()
 
+switch = server.outletswitch.OutletSwitch()
+
 class LightSwitchAPI(Resource):
     def __init__(self):
         self.light_switch = lightswitch.LightSwitch()
@@ -36,6 +39,7 @@ class LightSwitchAPI(Resource):
             return { 'message' : 'Data provided must be in JSON format.' }, 400
 
         data = json.loads(request.data)
+        switch.set_status(data['status'])
         self.light_switch.set_light(data['status'])
 
         return { 'status' : data['status'] }
