@@ -30,6 +30,10 @@ button:active {
     justify-content: center;
 }
 
+.light-switch-buttons #on-button, #off-button {
+    display: none;
+}
+
 .light-switch-buttons button {
     /*width: 50%;*/
     /*height: 50%;*/
