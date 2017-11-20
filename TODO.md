@@ -1,6 +1,7 @@
 # To Do  
 
-## Tasks  
+## Tasks 
+* Add logging to flask server 
 * Add progress/spinner when loading/setting light status (front end) (possible with pure CSS? codepen)
 * Replace on/off button with lightbulb graphic that visually turns on/off, displays current status
 * Update front end to display status now that GET is supported
