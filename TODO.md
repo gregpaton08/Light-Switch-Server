@@ -12,6 +12,7 @@
 ## Completed  
 * REST API
 * AJAX front end using REST API
+* Change displayed texted to "loading..." when loading page or on/off action is in progress
 
 
 ## Stretch Goals  
