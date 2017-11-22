@@ -30,11 +30,12 @@ button:active {
     justify-content: center;
 }
 
-.light-switch-buttons #on-button, #off-button {
+.light-switch-buttons #on-button, #off-button, #loading {
     display: none;
+    font-family: Arial;
 }
 
-.light-switch-buttons button {
+.light-switch-buttons button, p {
     /*width: 50%;*/
     /*height: 50%;*/
     font-size: 100px;

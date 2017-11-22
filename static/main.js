@@ -3,13 +3,14 @@ function updateStatus() {
     $.getJSON('/api/v1.0/light_status', {}, function(data) {
         onButton = document.getElementById('on-button');
         offButton = document.getElementById('off-button');
+        loading = document.getElementById('loading').style.display = 'none';
 
         if (data.status) {
             onButton.style.display = 'none';
             offButton.style.display = 'block';
         } else {
-            onButton.style.display = 'block';
             offButton.style.display = 'none';
+            onButton.style.display = 'block';
         }
     })
 }
@@ -17,6 +18,7 @@ function updateStatus() {
 $("button").click(function(e) {
     onButton = document.getElementById('on-button').style.display = 'none';
     offButton = document.getElementById('off-button').style.display = 'none';
+    loading = document.getElementById('loading').style.display = 'block';
 
     $.ajax({
         dataType : "json",
