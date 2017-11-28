@@ -3,14 +3,22 @@ function updateStatus() {
     $.getJSON('/api/v1.0/light_status', {}, function(data) {
         onButton = document.getElementById('on-button');
         offButton = document.getElementById('off-button');
-        loading = document.getElementById('loading').style.display = 'none';
+        loading = document.getElementById('loading');
+        loadError = document.getElementById('load-error');
 
-        if (data.status) {
-            onButton.style.display = 'none';
-            offButton.style.display = 'block';
-        } else {
-            offButton.style.display = 'none';
-            onButton.style.display = 'block';
+        if (data == null) {
+            loadError.style.display = 'block';
+            loading.style.display = 'none';
+        }
+        else {
+            loadError.style.display = 'none';
+            if (data.status) {
+                onButton.style.display = 'none';
+                offButton.style.display = 'block';
+            } else {
+                offButton.style.display = 'none';
+                onButton.style.display = 'block';
+            }
         }
     })
 }
