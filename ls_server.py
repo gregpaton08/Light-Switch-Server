@@ -14,7 +14,6 @@ import json
 from switch_hardware import server
 
 
-_PORT = 3333
 DEBUG = True
 pid_file_name = 'ls_server_pid'
 
@@ -62,8 +61,14 @@ def light_main():
 if __name__ == "__main__":
     pid_file = pidfile.PidFile(pid_file_name)
 
+    port = None
     try:
-        app.run(host='0.0.0.0', port=_PORT, debug=DEBUG)
+        port = sys.argv[1]
+    except IndexError:
+        port = 3333
+
+    try:
+        app.run(host='0.0.0.0', port=port, debug=DEBUG)
     except KeyboardInterrupt:
         pass
 
