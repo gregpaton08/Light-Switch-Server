@@ -63,7 +63,7 @@ if __name__ == "__main__":
 
     port = None
     try:
-        port = sys.argv[1]
+        port = int(sys.argv[1])
     except IndexError:
         port = 3333
 
