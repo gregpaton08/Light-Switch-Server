@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
-venv/bin/python ls_server.py
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+${DIR}/venv/bin/python ${DIR}/ls_server.py
