@@ -34,8 +34,7 @@ class LightSwitchAPI(Resource):
         try:
             return { 'status' : self.switch.get_status() }
         except:
-            # TODO: handle/report error.
-            pass
+            return { 'message' : 'ERROR: failed to get switch status' }, 400
 
     def put(self):
         if not request.is_json:
@@ -45,8 +44,7 @@ class LightSwitchAPI(Resource):
         try:
             self.switch.set_status(data['status'])
         except:
-            # TODO: handle/report error.
-            pass
+            return { 'message' : 'ERROR: failed to set switch status' }, 400
 
         return { 'status' : data['status'] }
 
