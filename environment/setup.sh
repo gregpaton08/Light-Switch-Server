@@ -1,8 +1,13 @@
-# install flask
-pip install flask
+#!/usr/bin/env bash
 
-# install RPi.GPIO
-pip install rpi.gpio
+# get the directory of this script
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd ${DIR}/..
 
-# install crontab
-pip install python-crontab
+venv_dir="venv"
+if [ ! -d "$venv_dir" ]; then
+    virtualenv venv
+    sh ${DIR}/install_rf24.sh
+
+    venv/bin/pip install -r requirements.txt
+fi
