@@ -9,8 +9,8 @@
 # Description:       Web server for controlling an outlet switch
 ### END INIT INFO
 
-SCRIPT=/home/pi/projects/light_switch/run.sh
-RUNAS=root
+SCRIPT="run_ls_server.sh"
+RUNAS="root"
 NAME="ls_server"
 
 PIDFILE=/var/run/$NAME.pid
