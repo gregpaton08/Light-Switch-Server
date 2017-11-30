@@ -5,6 +5,7 @@
 * Add progress/spinner when loading/setting light status (front end) (possible with pure CSS? codepen)
 * Replace on/off button with lightbulb graphic that visually turns on/off, displays current status
 * iOS app and widget (separate project)
+* research: how to install (?) so that production is separate from development environment
 
 ## Completed  
 * REST API
