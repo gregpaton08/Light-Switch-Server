@@ -4,15 +4,13 @@
 * Add logging to flask server 
 * Add progress/spinner when loading/setting light status (front end) (possible with pure CSS? codepen)
 * Replace on/off button with lightbulb graphic that visually turns on/off, displays current status
-* Update front end to display status now that GET is supported
-* General cleanup (need to break this down, specify)
-  * Isolate alarm code/logic
 * iOS app and widget (separate project)
 
 ## Completed  
 * REST API
 * AJAX front end using REST API
 * Change displayed texted to "loading..." when loading page or on/off action is in progress
+* Update front end to display status now that GET is supported
 
 
 ## Stretch Goals  
