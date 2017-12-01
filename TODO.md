@@ -6,6 +6,7 @@
 * Replace on/off button with lightbulb graphic that visually turns on/off, displays current status
 * iOS app and widget (separate project)
 * research: how to install (?) so that production is separate from development environment
+* research: make generic switches which can be added/configured by the user without adhoc programming
 
 ## Completed  
 * REST API
