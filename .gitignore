@@ -4,3 +4,5 @@ ls_server_pid
 venv
 build
 crontest*
+.rf24.stubs.status.pkl
+
