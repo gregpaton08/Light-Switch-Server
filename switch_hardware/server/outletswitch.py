@@ -1,5 +1,10 @@
 import time
-from RF24 import *
+
+try:
+    from RF24 import *
+except ImportError:
+    print("ERROR: failed to import RF24. Importing stubs instead.")
+    from RF24stubs import *
 
 ### NRF24l01 pinout
 # 1 GND  =>  ground
