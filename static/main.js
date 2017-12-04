@@ -4,13 +4,11 @@ function updateStatus() {
         onButton = document.getElementById('on-button');
         offButton = document.getElementById('off-button');
         loadError = document.getElementById('load-error');
-        document.getElementById('loading').style.display = 'none';
 
         if (data == null) {
             loadError.style.display = 'block';
         }
         else {
-            loadError.style.display = 'none';
             if (data.status) {
                 onButton.style.display = 'none';
                 offButton.style.display = 'block';
@@ -23,10 +21,6 @@ function updateStatus() {
 }
 
 $("button").click(function(e) {
-    onButton = document.getElementById('on-button').style.display = 'none';
-    offButton = document.getElementById('off-button').style.display = 'none';
-    loading = document.getElementById('loading').style.display = 'block';
-
     $.ajax({
         dataType : "json",
         contentType: "application/json; charset=utf-8",
