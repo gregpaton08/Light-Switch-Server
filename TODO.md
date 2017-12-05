@@ -1,6 +1,7 @@
 # To Do  
 
 ## Tasks 
+* fix hardware: add transitor/diode to control relay
 * Add logging to flask server 
 * Add progress/spinner when loading/setting light status (front end) (possible with pure CSS? codepen)
 * Replace on/off button with lightbulb graphic that visually turns on/off, displays current status
