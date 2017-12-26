@@ -10,6 +10,7 @@
 * iOS app and widget (separate project)
 * research: how to install (?) so that production is separate from development environment
 * add alarm API and interface (e.g. turn on living room light at 6am)
+* build remote to control light (button + arduino + NRF)
 
 ## Completed  
 * REST API
