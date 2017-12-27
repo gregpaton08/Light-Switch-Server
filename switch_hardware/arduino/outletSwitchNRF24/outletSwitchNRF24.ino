@@ -5,8 +5,9 @@
 // IRQ is pin 7
 const uint8_t irqPin = 7;
 
-// Set up nRF24L01 radio on SPI bus plus pins 7 & 8
-
+// Set up nRF24L01 radio on SPI bus plus pins for chip enable and chip select.
+// Pin 9  - chip enable
+// Pin 10 - chip select
 RF24 radio(9, 10);
 
 // Radio pipe addresses for the 2 nodes to communicate.
