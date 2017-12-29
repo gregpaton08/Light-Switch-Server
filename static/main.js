@@ -6,10 +6,13 @@ function updateStatus() {
         loadError = document.getElementById('load-error');
 
         if (data == null) {
+            console.log('data is null');
             loadError.style.display = 'block';
         }
         else {
-            if (data.status) {
+            if (data.message && data.message.contains('ERROR')) {
+                console.log('error');
+            } else if (data.status) {
                 onButton.style.display = 'none';
                 offButton.style.display = 'block';
             } else {
@@ -17,7 +20,10 @@ function updateStatus() {
                 onButton.style.display = 'block';
             }
         }
-    })
+    }).fail(function() {
+        document.getElementById('load-error').style.display = 'block';
+        console.log('fail');
+    });
 }
 
 $("button").click(function(e) {
@@ -33,4 +39,6 @@ $("button").click(function(e) {
     })
 });
 
-updateStatus();
+window.onload = function() {
+    updateStatus();
+}
