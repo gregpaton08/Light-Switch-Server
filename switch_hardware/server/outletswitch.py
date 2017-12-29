@@ -34,21 +34,17 @@ class OutletSwitch:
 
         self.millis = lambda: int(round(time.time() * 1000))
 
-    def __send_message(self, message, retries=100):
-        for x in xrange(retries):
-            self.radio.stopListening()
-            self.radio.write(message)
-            self.radio.startListening()
+    def __send_message(self, message):
+        self.radio.stopListening()
+        self.radio.write(message)
+        self.radio.startListening()
 
-            # Wait here until for a response, or timeout.
-            started_waiting_at = self.millis()
-            timeout = False
-            while (not self.radio.available()) and (not timeout):
-                if (self.millis() - started_waiting_at) > 250:
-                    timeout = True
-
-            if not timeout:
-                break
+        # Wait here until for a response, or timeout.
+        started_waiting_at = self.millis()
+        timeout = False
+        while (not self.radio.available()) and (not timeout):
+            if (self.millis() - started_waiting_at) > 250:
+                timeout = True
 
         if timeout:
             raise Exception('Status request timed out')
