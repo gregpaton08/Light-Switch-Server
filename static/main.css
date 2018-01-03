@@ -1,3 +1,8 @@
+body {
+    font-family: helvetica;
+    color: #777;
+}
+
 button {
     border: none;
     padding: 0px;
@@ -23,8 +28,6 @@ button:active {
     width: 75%;
     height: 100vh;
 
-    /*width: 800px;*/
-    /*height: 800px;*/
     display: flex;
     align-items: center;
     justify-content: center;
@@ -32,12 +35,9 @@ button:active {
 
 .light-switch-buttons #on-button, #off-button, #loading, #load-error {
     display: none;
-    font-family: Arial;
 }
 
 .light-switch-buttons button, p {
-    /*width: 50%;*/
-    /*height: 50%;*/
     font-size: 100px;
     margin: 50px;
 }

@@ -1,14 +1,15 @@
 
 function updateStatus() {
+    loadError = document.getElementById('load-error');
     $.getJSON('/api/v1.0/light_status', {}, function(data) {
-        onButton = document.getElementById('on-button');
-        offButton = document.getElementById('off-button');
-        loadError = document.getElementById('load-error');
 
         if (data == null) {
             loadError.style.display = 'block';
         }
         else {
+            loadError.style.display = 'none';
+            onButton = document.getElementById('on-button');
+            offButton = document.getElementById('off-button');
             if (data.status) {
                 onButton.style.display = 'none';
                 offButton.style.display = 'block';
@@ -18,6 +19,12 @@ function updateStatus() {
             }
         }
     })
+    .fail(function() {
+        loadError.style.display = 'block';
+    })
+    .always(function() {
+        document.getElementById('loading').display = 'none';
+    });
 }
 
 $("button").click(function(e) {
@@ -33,4 +40,7 @@ $("button").click(function(e) {
     })
 });
 
-updateStatus();
+window.onload = function() {
+    document.getElementById('loading').display = 'block';
+    updateStatus();
+}
