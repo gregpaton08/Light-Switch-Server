@@ -2,6 +2,20 @@
 #include "nRF24L01.h"
 #include "RF24.h"
 
+// nrf24l01 to Arduino Pro Mini pinout
+// =======        ========
+// Arduino        nrf24l01
+// =======        ========
+// Pin 1 GND  ->  GND
+// Pin 2 VCC  ->  VCC
+// Pin 2 CE   ->  Pin 9
+// Pin 4 CSN  ->  Pin 10
+// Pin 5 SCK  ->  Pin 13
+// Pin 6 MOSI ->  Pin 11
+// Pin 7 MISO ->  Pin 12
+// Pin 8 IRQ  ->  Pin 7
+
+
 // IRQ is pin 7
 const uint8_t irqPin = 7;
 
