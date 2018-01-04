@@ -2,6 +2,8 @@
 function updateStatus() {
     // loading = document.getElementById('loading');
     loadError = document.getElementById('load-error');
+    onButton = document.getElementById('on-button');
+    offButton = document.getElementById('off-button');
     $.getJSON('/api/v1.0/light_status', {}, function(data) {
 
         if (data == null) {
@@ -9,8 +11,6 @@ function updateStatus() {
         }
         else {
             loadError.style.display = 'none';
-            onButton = document.getElementById('on-button');
-            offButton = document.getElementById('off-button');
             if (data.status) {
                 onButton.style.display = 'none';
                 offButton.style.display = 'block';
@@ -21,6 +21,8 @@ function updateStatus() {
         }
     })
     .fail(function() {
+        onButton.style.display = 'none';
+        offButton.style.display = 'none';
         loadError.style.display = 'block';
     })
     .always(function() {
