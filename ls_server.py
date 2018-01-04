@@ -7,7 +7,6 @@ import os
 from crontab import CronTab
 import signal
 import sys
-import lsauth
 from flask_restful import Resource, Api
 import json
 from switch_hardware import server
