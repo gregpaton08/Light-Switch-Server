@@ -15,5 +15,5 @@ while 1:
             switch.set_status(True)
         elif int(command) == 2:
             print(switch.get_status())
-    except:
-        print('request timed out')
+    except Exception as e:
+        print(e)
