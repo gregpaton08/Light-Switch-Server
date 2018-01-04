@@ -8,13 +8,12 @@ from crontab import CronTab
 import signal
 import sys
 import lsauth
-import pidfile
 from flask_restful import Resource, Api
 import json
 from switch_hardware import server
 
 
-DEBUG = True
+DEBUG = False
 pid_file_name = 'ls_server_pid'
 
 
@@ -57,18 +56,15 @@ def light_main():
 
 
 if __name__ == "__main__":
-    pid_file = pidfile.PidFile(pid_file_name)
-
-    port = None
+    port = 3333
     try:
         port = int(sys.argv[1])
     except IndexError:
-        port = 3333
+        pass
 
     try:
         app.run(host='0.0.0.0', port=port, debug=DEBUG)
     except KeyboardInterrupt:
         pass
 
-    pid_file.cleanup()
     print 'light switch server shutting down...'
