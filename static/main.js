@@ -1,5 +1,6 @@
 
 function updateStatus() {
+    // loading = document.getElementById('loading');
     loadError = document.getElementById('load-error');
     $.getJSON('/api/v1.0/light_status', {}, function(data) {
 
@@ -23,24 +24,24 @@ function updateStatus() {
         loadError.style.display = 'block';
     })
     .always(function() {
-        document.getElementById('loading').display = 'none';
+        document.getElementById('loading').style.display = 'none';
     });
 }
 
-$("button").click(function(e) {
-    $.ajax({
-        dataType : "json",
-        contentType: "application/json; charset=utf-8",
-        url: '/api/v1.0/light_status',
-        method: 'PUT',
-        data: JSON.stringify({ 'status' : $(this).val() === 'true' }),
-        success: function() {
-            updateStatus();
-        }
-    })
-});
-
 window.onload = function() {
+    $( "button" ).click(function() {
+        $.ajax({
+            dataType : "json",
+            contentType: "application/json; charset=utf-8",
+            url: '/api/v1.0/light_status',
+            method: 'PUT',
+            data: JSON.stringify({ 'status' : $(this).val() === 'true' }),
+            success: function() {
+                updateStatus();
+            }
+        })
+    });
+
     document.getElementById('loading').display = 'block';
     updateStatus();
 }

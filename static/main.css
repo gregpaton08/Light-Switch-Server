@@ -33,7 +33,7 @@ button:active {
     justify-content: center;
 }
 
-.light-switch-buttons #on-button, #off-button, #loading, #load-error {
+.light-switch-buttons #on-button, #off-button, #load-error {
     display: none;
 }
 
