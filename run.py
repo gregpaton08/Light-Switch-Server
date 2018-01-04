@@ -1,6 +1,5 @@
 #!venv/bin/python
 
-from flask import Flask
 import sys
 from outletswitch import app
 

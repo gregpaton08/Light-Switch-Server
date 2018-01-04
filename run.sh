@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-${DIR}/venv/bin/python ${DIR}/ls_server.py $@
+${DIR}/venv/bin/python ${DIR}/run.py $@
