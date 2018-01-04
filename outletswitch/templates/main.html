@@ -7,15 +7,15 @@
     <script type="text/javascript" src="{{ url_for('static', filename='jquery.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='main.js') }}"></script>
 
-    <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ url_for('static/images', filename='favicon.png') }}">
 </head>
 
 <body>
     <div class="light-switch-buttons">
         <p id="loading">loading...</p>
         <p id="load-error">Can't access switch</p>
-        <button id="on-button" type="button" value="true"><img src="{{ url_for('static', filename='bulb-off.png') }}"></button>
-        <button id="off-button" type="button" value="false"><img src="{{ url_for('static', filename='bulb-on.png') }}"></button>
+        <button id="on-button" type="button" value="true"><img src="{{ url_for('static/images', filename='bulb-off.png') }}"></button>
+        <button id="off-button" type="button" value="false"><img src="{{ url_for('static/images', filename='bulb-on.png') }}"></button>
     </div>
 </body>
 </html>
