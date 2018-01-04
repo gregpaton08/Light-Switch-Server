@@ -52,6 +52,4 @@ class OutletSwitch:
         self.__send_message(bytes(1 if on else 0))
 
     def get_status(self):
-        if self.__send_message(bytes(2)) == "1":
-            return True
-        return False
+        return self.__send_message(bytes(2)) == "1"
