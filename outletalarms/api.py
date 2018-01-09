@@ -15,6 +15,26 @@ jobstores = {
 }
 scheduler = BackgroundScheduler(jobstores=jobstores)
 
+# API JSON Data
+# {
+#     id : <id>,
+#     enabled : <true|false>,
+#     action : <action>,
+#     minute : <minute>,
+#     hour : <hour>,
+#     days : <days>
+# }
+#
+# example:
+# {
+#     id : 1,
+#     enabled : true,
+#     action : 'switch 0 on',
+#     minute : 0,
+#     hour : 6,
+#     days : '0,1,2,3,4,5,6'
+# }
+
 class OutletAlarm(Resource):
     def get(self, alarm_id):
         print('get for {0}'.format(alarm_id))
