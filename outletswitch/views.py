@@ -1,11 +1,5 @@
 
 from flask import Flask, render_template, request, jsonify, abort, make_response
-import time
-from threading import Thread
-import os
-from crontab import CronTab
-import signal
-import sys
 from flask_restful import Resource, Api
 import json
 from switch_hardware import server
