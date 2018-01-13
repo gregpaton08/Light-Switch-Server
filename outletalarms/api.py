@@ -15,6 +15,9 @@ jobstores = {
     'default' : SQLAlchemyJobStore(url='sqlite:///' + sqlite_db_file_name)
 }
 scheduler = BackgroundScheduler(jobstores=jobstores)
+scheduler.start()
+
+print('running api.py')
 
 # API JSON Data
 # {
@@ -55,6 +58,20 @@ class OutletAlarm(Resource):
 class OutletAlarmList(Resource):
     def get(self):
         print('get OutletAlarmList')
+        jobs = scheduler.get_jobs()
+        print('there are {0} jobs'.format(len(jobs)))
+        list_of_json_jobs = []
+        for job in jobs:
+            list_of_json_jobs.append(
+                {
+                    'id' : job.id,
+                    'enabled' : True,
+                    'action' : job.func.__name__
+                    # 'minute' : [field for field in job.trigger.fields if field.name == 'minute'][0].get_value()
+                }
+            )
+
+        return list_of_json_jobs, 200
 
     def post(self):
         try:
