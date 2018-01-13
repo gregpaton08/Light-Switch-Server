@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, abort, make_response
 from flask_restful import Resource, Api
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+import json
 
 
 app = Flask(__name__)
@@ -51,7 +52,14 @@ class OutletAlarmList(Resource):
         print('get OutletAlarmList')
 
     def post(self):
-        print('post OutletAlarmList')
+        try:
+            data = json.loads(request.data)
+        except ValueError:
+            print('ERROR: invalid JSON received')
+        try:
+            print(data)
+        except:
+            return { 'message' : 'ERROR: failed to create alarm' }, 400
 
 
 api.add_resource(OutletAlarmList, '/alarms')
