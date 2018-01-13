@@ -3,6 +3,7 @@ from flask_restful import Resource, Api
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 import json
+from switch_hardware import server
 
 
 app = Flask(__name__)
@@ -16,6 +17,8 @@ jobstores = {
 }
 scheduler = BackgroundScheduler(jobstores=jobstores)
 scheduler.start()
+
+switch = server.outletswitch.OutletSwitch()
 
 # API JSON Data
 # {
@@ -42,6 +45,21 @@ scheduler.start()
 
 def test_job_function():
     print('test job function')
+
+def set_switch_status(status):
+    switch.set_status(status)
+
+action_dict = {
+    'set_switch_status' : set_switch_status
+}
+
+def __string_to_bool(bool_string):
+    if bool_string.lower() in [ 'true', '1', 'yes', 'on']:
+        return True
+    elif bool_string.lower() in [ 'false', '0', 'no', 'off' ]:
+        return False
+    else:
+        raise Exception('invalid boolean value {0}'.format(bool_string))
 
 def job_to_dict(job):
     field_value = lambda job, field: [x for x in job.trigger.fields if x.name == field][0].__str__()
@@ -99,8 +117,14 @@ class OutletAlarmList(Resource):
             data = json.loads(request.data)
         except ValueError:
             return { 'message' : 'ERROR: received invalid JSON' }, 400
+
         try:
-            scheduler.add_job(test_job_function, 'cron', day_of_week=data['days'], hour=data['hour'], minute=data['minute'], name=data.get('name', None))
+            action = data['action'].split(' ')
+            function_name = action[0]
+            arguments = action[1:]
+            if not action_dict.has_key(function_name):
+                raise Exception('invalide action: {0}'.format(function_name))
+            scheduler.add_job(action_dict[function_name], 'cron', day_of_week=data['days'], hour=data['hour'], minute=data['minute'], name=data.get('name', None), args=arguments)
         except Exception as e:
             return { 'message' : 'ERROR: failed to create alarm {0}'.format(e) }, 400
 
