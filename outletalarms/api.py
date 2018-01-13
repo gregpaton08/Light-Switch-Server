@@ -17,8 +17,6 @@ jobstores = {
 scheduler = BackgroundScheduler(jobstores=jobstores)
 scheduler.start()
 
-print('running api.py')
-
 # API JSON Data
 # {
 #     id : <id>,
@@ -43,9 +41,24 @@ print('running api.py')
 def test_job_function():
     print('test job function')
 
+def job_to_dict(job):
+    field_value = lambda job, field: [x for x in job.trigger.fields if x.name == field][0].__str__()
+    return {
+        'id' : job.id,
+        'enabled' : True,
+        'action' : job.func.__name__,
+        'minute' : field_value(job, 'minute'),
+        'hour' : field_value(job, 'hour'),
+        'days' : field_value(job, 'day_of_week')
+    }
+
 class OutletAlarm(Resource):
     def get(self, alarm_id):
         print('get for {0}'.format(alarm_id))
+        try:
+            job = scheduler.get_job(alarm_id)
+        except:
+            return { 'message' : 'ERROR: no alarm found for id {0}'.format(alarm_id) }
 
     def put(self, alarm_id):
         print('put for {0}'.format(alarm_id))
@@ -60,16 +73,7 @@ class OutletAlarmList(Resource):
         field_value = lambda job, field: [x for x in job.trigger.fields if x.name == field][0].__str__()
         list_of_json_jobs = []
         for job in jobs:
-            list_of_json_jobs.append(
-                {
-                    'id' : job.id,
-                    'enabled' : True,
-                    'action' : job.func.__name__,
-                    'minute' : field_value(job, 'minute'),
-                    'hour' : field_value(job, 'hour'),
-                    'days' : field_value(job, 'day_of_week')
-                }
-            )
+            list_of_json_jobs.append(job_to_dict(job))
 
         return list_of_json_jobs, 200
 
@@ -83,6 +87,8 @@ class OutletAlarmList(Resource):
             scheduler.add_job(test_job_function, 'cron', day_of_week=data['days'], hour=data['hour'], minute=data['minute'])
         except Exception as e:
             return { 'message' : 'ERROR: failed to create alarm {0}'.format(e) }, 400
+
+        return 200
 
 
 api.add_resource(OutletAlarmList, '/alarms')
