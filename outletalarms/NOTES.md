@@ -32,5 +32,11 @@ curl http://localhost:8000/alarms/19a9619319b344e5b5c27009ac474f3f -X PUT -H "Co
     \"minute\":35\
 }"
 
+curl http://localhost:8000/alarms/19a9619319b344e5b5c27009ac474f3f -X PUT -H "Content-Type: application/json" -d \
+"{\
+    \"name\":\"RISE AND SHINE"\!"\"\
+}"
+
+
 curl http://localhost:8000/alarms/19a9619319b344e5b5c27009ac474f3f -X DELETE
 ```
