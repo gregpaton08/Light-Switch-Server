@@ -17,7 +17,7 @@ _API_URL_ROUTE = '/api/v1.0/'
 
 switch = server.outletswitch.OutletSwitch()
 
-class LightSwitchAPI(Resource):
+class OutletSwitch(Resource):
     def __init__(self):
         self.switch = switch
 
@@ -39,7 +39,7 @@ class LightSwitchAPI(Resource):
 
         return { 'status' : data['status'] }
 
-api.add_resource(LightSwitchAPI, _API_URL_ROUTE + 'light_status')
+api.add_resource(OutletSwitch, _API_URL_ROUTE + 'light_status')
 
 
 @app.route("/")
