@@ -20,6 +20,7 @@ scheduler.start()
 # API JSON Data
 # {
 #     id : <id>,
+#     name : <alarm name>
 #     enabled : <true|false>,
 #     action : <action>,
 #     minute : <minute>,
@@ -30,6 +31,7 @@ scheduler.start()
 # example:
 # {
 #     id : 1,
+#     name : 'daily morning alarm'
 #     enabled : true,
 #     action : 'switch 0 on',
 #     minute : 0,
@@ -45,7 +47,7 @@ def job_to_dict(job):
     field_value = lambda job, field: [x for x in job.trigger.fields if x.name == field][0].__str__()
     return {
         'id' : job.id,
-        # 'name' : job.name,
+        'name' : job.name,
         'enabled' : True,
         'action' : job.func.__name__,
         'minute' : field_value(job, 'minute'),
@@ -67,12 +69,12 @@ class OutletAlarm(Resource):
         except ValueError:
             return { 'message' : 'ERROR: received invalid JSON' }, 400
 
-        # try:
-        job = job_to_dict(scheduler.get_job(alarm_id))
-        scheduler.reschedule_job(job['id'], trigger='cron', day_of_week=data.get('days', job['days']), hour=data.get('hour', job['hour']), minute=data.get('minute', job['minute']))
-        return self.get(alarm_id)
-        # except:
-        #     return { 'message' : 'ERROR: no alarm found for id {0}'.format(alarm_id) }
+        try:
+            job = job_to_dict(scheduler.get_job(alarm_id))
+            scheduler.reschedule_job(job['id'], trigger='cron', day_of_week=data.get('days', job['days']), hour=data.get('hour', job['hour']), minute=data.get('minute', job['minute']))
+            return self.get(alarm_id)
+        except:
+            return { 'message' : 'ERROR: no alarm found for id {0}'.format(alarm_id) }
 
     def delete(self, alarm_id):
         try:
@@ -97,7 +99,7 @@ class OutletAlarmList(Resource):
         except ValueError:
             return { 'message' : 'ERROR: received invalid JSON' }, 400
         try:
-            scheduler.add_job(test_job_function, 'cron', day_of_week=data['days'], hour=data['hour'], minute=data['minute'])
+            scheduler.add_job(test_job_function, 'cron', day_of_week=data['days'], hour=data['hour'], minute=data['minute'], name=data['name'])
         except Exception as e:
             return { 'message' : 'ERROR: failed to create alarm {0}'.format(e) }, 400
 
