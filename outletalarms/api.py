@@ -61,7 +61,7 @@ def __string_to_bool(bool_string):
     else:
         raise Exception('invalid boolean value {0}'.format(bool_string))
 
-def job_to_dict(job):
+def __job_to_dict(job):
     field_value = lambda job, field: [x for x in job.trigger.fields if x.name == field][0].__str__()
     return {
         'id' : job.id,
@@ -77,7 +77,7 @@ class OutletAlarm(Resource):
     def get(self, alarm_id):
         try:
             job = scheduler.get_job(alarm_id)
-            return job_to_dict(job)
+            return __job_to_dict(job)
         except:
             return { 'message' : 'ERROR: no alarm found for id {0}'.format(alarm_id) }
 
@@ -88,7 +88,7 @@ class OutletAlarm(Resource):
             return { 'message' : 'ERROR: received invalid JSON' }, 400
 
         try:
-            job = job_to_dict(scheduler.get_job(alarm_id))
+            job = __job_to_dict(scheduler.get_job(alarm_id))
             scheduler.modify_job(alarm_id, name=data.get('name', job['name']))
             scheduler.reschedule_job(job['id'], trigger='cron', day_of_week=data.get('days', job['days']), hour=data.get('hour', job['hour']), minute=data.get('minute', job['minute']))
             return self.get(alarm_id)
@@ -108,7 +108,7 @@ class OutletAlarmList(Resource):
         field_value = lambda job, field: [x for x in job.trigger.fields if x.name == field][0].__str__()
         list_of_json_jobs = []
         for job in jobs:
-            list_of_json_jobs.append(job_to_dict(job))
+            list_of_json_jobs.append(__job_to_dict(job))
 
         return list_of_json_jobs, 200
 
