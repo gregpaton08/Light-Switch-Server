@@ -36,6 +36,11 @@ scheduler = BackgroundScheduler(jobstores=jobstores)
 #     days : '0,1,2,3,4,5,6'
 # }
 
+
+def test_job_function():
+    print('test job function')
+
+
 class OutletAlarm(Resource):
     def get(self, alarm_id):
         print('get for {0}'.format(alarm_id))
@@ -58,8 +63,9 @@ class OutletAlarmList(Resource):
             print('ERROR: invalid JSON received')
         try:
             print(data)
-        except:
-            return { 'message' : 'ERROR: failed to create alarm' }, 400
+            scheduler.add_job(test_job_function, 'cron', day_of_week=data['days'], hour=data['hour'], minute=data['minute'])
+        except Exception as e:
+            return { 'message' : 'ERROR: failed to create alarm {0}'.format(e) }, 400
 
 
 api.add_resource(OutletAlarmList, '/alarms')
