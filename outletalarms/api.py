@@ -45,6 +45,7 @@ def job_to_dict(job):
     field_value = lambda job, field: [x for x in job.trigger.fields if x.name == field][0].__str__()
     return {
         'id' : job.id,
+        # 'name' : job.name,
         'enabled' : True,
         'action' : job.func.__name__,
         'minute' : field_value(job, 'minute'),
@@ -61,7 +62,17 @@ class OutletAlarm(Resource):
             return { 'message' : 'ERROR: no alarm found for id {0}'.format(alarm_id) }
 
     def put(self, alarm_id):
-        print('put for {0}'.format(alarm_id))
+        try:
+            data = json.loads(request.data)
+        except ValueError:
+            return { 'message' : 'ERROR: received invalid JSON' }, 400
+
+        # try:
+        job = job_to_dict(scheduler.get_job(alarm_id))
+        scheduler.reschedule_job(job['id'], trigger='cron', day_of_week=data.get('days', job['days']), hour=data.get('hour', job['hour']), minute=data.get('minute', job['minute']))
+        return self.get(alarm_id)
+        # except:
+        #     return { 'message' : 'ERROR: no alarm found for id {0}'.format(alarm_id) }
 
     def delete(self, alarm_id):
         try:
@@ -86,7 +97,6 @@ class OutletAlarmList(Resource):
         except ValueError:
             return { 'message' : 'ERROR: received invalid JSON' }, 400
         try:
-            print(data)
             scheduler.add_job(test_job_function, 'cron', day_of_week=data['days'], hour=data['hour'], minute=data['minute'])
         except Exception as e:
             return { 'message' : 'ERROR: failed to create alarm {0}'.format(e) }, 400

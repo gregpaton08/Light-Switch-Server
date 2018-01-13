@@ -11,13 +11,26 @@ curl http://localhost:8000/alarms -X POST -H "Content-Type: application/json" -d
     \"enabled\":true\
 }"
 
-curl http://<RPi address>:<RPi port>/api/v1.0/light_status -X PUT -H "Content-Type: application/json" -d "{\"status\":false}"
-
 curl http://localhost:8000/alarms -X GET
 ```
 
 ```
-curl http://localhost:8000/alarms/5cb872fff45c430d9e55f52559a13860 -X GET
+curl http://localhost:8000/alarms/19a9619319b344e5b5c27009ac474f3f -X GET
 
-curl http://localhost:8000/alarms/5cb872fff45c430d9e55f52559a13860 -X DELETE
+curl http://localhost:8000/alarms/19a9619319b344e5b5c27009ac474f3f -X PUT -d \
+"{\
+    \"enabled\":true,\
+    \"action\":\"switch 0 on\",\
+    \"minute\":34,\
+    \"hour\":10,\
+    \"days\":\"0,1,2,3,4,5,6\"\
+}"
+
+curl http://localhost:8000/alarms/19a9619319b344e5b5c27009ac474f3f -X PUT -H "Content-Type: application/json" -d \
+"{\
+    \"hour\":11,\
+    \"minute\":35\
+}"
+
+curl http://localhost:8000/alarms/19a9619319b344e5b5c27009ac474f3f -X DELETE
 ```
