@@ -18,4 +18,6 @@ curl http://localhost:8000/alarms -X GET
 
 ```
 curl http://localhost:8000/alarms/5cb872fff45c430d9e55f52559a13860 -X GET
+
+curl http://localhost:8000/alarms/5cb872fff45c430d9e55f52559a13860 -X DELETE
 ```

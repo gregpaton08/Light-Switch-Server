@@ -54,7 +54,6 @@ def job_to_dict(job):
 
 class OutletAlarm(Resource):
     def get(self, alarm_id):
-        print('get for {0}'.format(alarm_id))
         try:
             job = scheduler.get_job(alarm_id)
             return job_to_dict(job)
@@ -65,7 +64,10 @@ class OutletAlarm(Resource):
         print('put for {0}'.format(alarm_id))
 
     def delete(self, alarm_id):
-        print('delete for {0}'.format(alarm_id))
+        try:
+            scheduler.remove_job(alarm_id)
+        except:
+            return { 'message' : 'ERROR: no alarm found for id {0}'.format(alarm_id) }
 
 
 class OutletAlarmList(Resource):
