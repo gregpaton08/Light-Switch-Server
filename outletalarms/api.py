@@ -43,7 +43,6 @@ print('running api.py')
 def test_job_function():
     print('test job function')
 
-
 class OutletAlarm(Resource):
     def get(self, alarm_id):
         print('get for {0}'.format(alarm_id))
@@ -57,18 +56,18 @@ class OutletAlarm(Resource):
 
 class OutletAlarmList(Resource):
     def get(self):
-        print('get OutletAlarmList')
         jobs = scheduler.get_jobs()
-        print('there are {0} jobs'.format(len(jobs)))
-        print([field for field in job.trigger.fields if field.name == 'minute'][0])
+        field_value = lambda job, field: [x for x in job.trigger.fields if x.name == field][0].__str__()
         list_of_json_jobs = []
         for job in jobs:
             list_of_json_jobs.append(
                 {
                     'id' : job.id,
                     'enabled' : True,
-                    'action' : job.func.__name__
-                    # 'minute' : [field for field in job.trigger.fields if field.name == 'minute'][0].get_value()
+                    'action' : job.func.__name__,
+                    'minute' : field_value(job, 'minute'),
+                    'hour' : field_value(job, 'hour'),
+                    'days' : field_value(job, 'day_of_week')
                 }
             )
 
