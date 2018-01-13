@@ -57,6 +57,7 @@ class OutletAlarm(Resource):
         print('get for {0}'.format(alarm_id))
         try:
             job = scheduler.get_job(alarm_id)
+            return job_to_dict(job)
         except:
             return { 'message' : 'ERROR: no alarm found for id {0}'.format(alarm_id) }
 
