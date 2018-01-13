@@ -40,3 +40,8 @@ curl http://localhost:8000/alarms/19a9619319b344e5b5c27009ac474f3f -X PUT -H "Co
 
 curl http://localhost:8000/alarms/19a9619319b344e5b5c27009ac474f3f -X DELETE
 ```
+
+## References
+
+[API Docs](http://apscheduler.readthedocs.io/en/latest/py-modindex.html)
+
