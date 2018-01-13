@@ -60,6 +60,7 @@ class OutletAlarmList(Resource):
         print('get OutletAlarmList')
         jobs = scheduler.get_jobs()
         print('there are {0} jobs'.format(len(jobs)))
+        print([field for field in job.trigger.fields if field.name == 'minute'][0])
         list_of_json_jobs = []
         for job in jobs:
             list_of_json_jobs.append(
