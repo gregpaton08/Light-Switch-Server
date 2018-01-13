@@ -99,7 +99,7 @@ class OutletAlarmList(Resource):
         except ValueError:
             return { 'message' : 'ERROR: received invalid JSON' }, 400
         try:
-            scheduler.add_job(test_job_function, 'cron', day_of_week=data['days'], hour=data['hour'], minute=data['minute'], name=data['name'])
+            scheduler.add_job(test_job_function, 'cron', day_of_week=data['days'], hour=data['hour'], minute=data['minute'], name=data.get('name', None))
         except Exception as e:
             return { 'message' : 'ERROR: failed to create alarm {0}'.format(e) }, 400
 
