@@ -19,7 +19,8 @@ switch = server.outletswitch.OutletSwitch()
 
 class LightSwitchAPI(Resource):
     def __init__(self):
-        self.switch = switch = server.outletswitch.OutletSwitch()
+        print('init LightSwitchAPI')
+        self.switch = switch
 
     def get(self):
         try:
