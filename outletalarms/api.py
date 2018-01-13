@@ -42,18 +42,14 @@ switch = server.outletswitch.OutletSwitch()
 #     days : '0,1,2,3,4,5,6'
 # }
 
-
-def test_job_function():
-    print('test job function')
-
-def set_switch_status(status):
+def _set_switch_status(status):
     switch.set_status(status)
 
 action_dict = {
-    'set_switch_status' : set_switch_status
+    'set_switch_status' : _set_switch_status
 }
 
-def __string_to_bool(bool_string):
+def _string_to_bool(bool_string):
     if bool_string.lower() in [ 'true', '1', 'yes', 'on']:
         return True
     elif bool_string.lower() in [ 'false', '0', 'no', 'off' ]:
@@ -61,7 +57,7 @@ def __string_to_bool(bool_string):
     else:
         raise Exception('invalid boolean value {0}'.format(bool_string))
 
-def __job_to_dict(job):
+def _job_to_dict(job):
     field_value = lambda job, field: [x for x in job.trigger.fields if x.name == field][0].__str__()
     return {
         'id' : job.id,
@@ -77,7 +73,7 @@ class OutletAlarm(Resource):
     def get(self, alarm_id):
         try:
             job = scheduler.get_job(alarm_id)
-            return __job_to_dict(job)
+            return _job_to_dict(job)
         except:
             return { 'message' : 'ERROR: no alarm found for id {0}'.format(alarm_id) }
 
@@ -88,7 +84,7 @@ class OutletAlarm(Resource):
             return { 'message' : 'ERROR: received invalid JSON' }, 400
 
         try:
-            job = __job_to_dict(scheduler.get_job(alarm_id))
+            job = _job_to_dict(scheduler.get_job(alarm_id))
             scheduler.modify_job(alarm_id, name=data.get('name', job['name']))
             scheduler.reschedule_job(job['id'], trigger='cron', day_of_week=data.get('days', job['days']), hour=data.get('hour', job['hour']), minute=data.get('minute', job['minute']))
             return self.get(alarm_id)
@@ -106,11 +102,7 @@ class OutletAlarmList(Resource):
     def get(self):
         jobs = scheduler.get_jobs()
         field_value = lambda job, field: [x for x in job.trigger.fields if x.name == field][0].__str__()
-        list_of_json_jobs = []
-        for job in jobs:
-            list_of_json_jobs.append(__job_to_dict(job))
-
-        return list_of_json_jobs, 200
+        return [ _job_to_dict(job) for job in jobs], 200
 
     def post(self):
         try:
