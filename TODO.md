@@ -1,6 +1,11 @@
 # To Do  
 
 ## Tasks 
+* bug: fix this error:
+```
+bcm2835_init: gpio mmap failed: Cannot allocate memory
+/home/pi/projects/light_switch/run.sh: line 4:  2228 Segmentation fault      ${DIR}/venv/bin/python ${DIR}/run.py $@
+```
 * research: make generic switches which can be added/configured by the user without adhoc programming
   * create name, edit name, delete -> standard HTTP/REST operations
 * fix hardware: add transitor/diode to control relay
