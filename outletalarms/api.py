@@ -4,10 +4,12 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 import json
 from switch_hardware import server
+from flask_cors import CORS
 
 
 app = Flask(__name__)
 api = Api(app)
+CORS(app)
 
 _API_URL_ROUTE = '/api/v1.0/'
 
