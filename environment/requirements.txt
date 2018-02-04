@@ -3,6 +3,7 @@ APScheduler==3.5.0
 click==6.7
 crontab==0.22.0
 Flask==0.12.2
+Flask-Cors==3.0.3
 Flask-RESTful==0.3.6
 funcsigs==1.0.2
 futures==3.2.0
@@ -15,5 +16,5 @@ pytz==2017.3
 six==1.11.0
 SQLAlchemy==1.2.0
 tzlocal==1.5.1
-Werkzeug==0.12.2
+Werkzeug==0.14.1
 wheel==0.26.0
