@@ -111,14 +111,19 @@ class OutletAlarmList(Resource):
             return { 'message' : 'ERROR: received invalid JSON' }, 400
 
         try:
+            # validate the JSON
+            for key in [ 'action', 'days', 'hour', 'minute' ]:
+                if not data.has_key(key):
+                    raise Exception('JSON missing value for key \'{0}\''.format(key))
+
             action = data['action'].split(' ')
             function_name = action[0]
             arguments = action[1:]
             if not action_dict.has_key(function_name):
-                raise Exception('invalide action: {0}'.format(function_name))
+                raise Exception('invalid action: {0}'.format(function_name))
             scheduler.add_job(action_dict[function_name], 'cron', day_of_week=data['days'], hour=data['hour'], minute=data['minute'], name=data.get('name', None), args=arguments)
         except Exception as e:
-            return { 'message' : 'ERROR: failed to create alarm {0}'.format(e) }, 400
+            return { 'message' : 'ERROR: failed to create alarm. {0}'.format(e) }, 400
 
         return 200
 
