@@ -1,6 +1,6 @@
 #!/bin/sh
 ### BEGIN INIT INFO
-# Provides:          ls_server
+# Provides:          light_switch
 # Required-Start:    $local_fs $network $named $time $syslog
 # Required-Stop:     $local_fs $network $named $time $syslog
 # Default-Start:     2 3 4 5
@@ -9,12 +9,16 @@
 # Description:       Web server for controlling an outlet switch
 ### END INIT INFO
 
-SCRIPT="run_ls_server.sh"
+SCRIPT="/etc/init.d/run_outlet_switch.sh"
 RUNAS="root"
-NAME="ls_server"
+NAME="light_switch"
 
 PIDFILE=/var/run/$NAME.pid
 LOGFILE=/var/log/$NAME.log
+
+# Include functions 
+set -e
+. /lib/lsb/init-functions
 
 start() {
   if [ -f /var/run/$PIDNAME ] && kill -0 $(cat /var/run/$PIDNAME); then
@@ -50,6 +54,10 @@ uninstall() {
   fi
 }
 
+status() {
+  status_of_proc -p /var/run/$NAME.pid "" $NAME && exit 0 || exit $?
+}
+
 case "$1" in
   start)
     start
@@ -60,10 +68,13 @@ case "$1" in
   uninstall)
     uninstall
     ;;
-  retart)
+  restart)
     stop
     start
     ;;
+  status)
+    status
+    ;;
   *)
-    echo "Usage: $0 {start|stop|restart|uninstall}"
+    echo "Usage: $0 {start|stop|restart|status|uninstall}"
 esac
