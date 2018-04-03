@@ -1,5 +1,15 @@
 # light-switch-server
 
+## Run From Fresh Install
+
+```
+sudo apt-get update -y
+sudo apt-get upgrade -y
+sudo apt-get install python-pip
+sudo pip install virtualenv
+
+```
+
 ## Interacting with the API
 
 ### CURL

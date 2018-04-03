@@ -9,5 +9,5 @@ if [ ! -d "$venv_dir" ]; then
     virtualenv venv
     sh ${DIR}/install_rf24.sh
 
-    venv/bin/pip install -r requirements.txt
+    venv/bin/pip install -r ${DIR}/requirements.txt
 fi
