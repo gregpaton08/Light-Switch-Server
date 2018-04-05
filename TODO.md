@@ -1,6 +1,7 @@
 # To Do  
 
 ## Tasks 
+* Implement authentication for web and mobile
 * bug: fix this error:
 ```
 bcm2835_init: gpio mmap failed: Cannot allocate memory
