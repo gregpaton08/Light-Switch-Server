@@ -34,7 +34,7 @@ class OutletSwitch:
 
         self.millis = lambda: int(round(time.time() * 1000))
 
-    def __send_message(self, message, retries=5, time_out_duration=50):
+    def __send_message(self, message, retries=10, time_out_duration=50):
         for x in xrange(0, retries):
             # Send the message.
             self.radio.stopListening()

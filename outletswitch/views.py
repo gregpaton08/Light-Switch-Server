@@ -25,17 +25,17 @@ class OutletSwitch(Resource):
         try:
             return { 'status' : self.switch.get_status() }
         except:
-            return { 'message' : 'ERROR: failed to get switch status' }, 400
+            return { 'message' : 'ERROR: failed to get switch status' }, 500
 
     def put(self):
         if not request.is_json:
-            return { 'message' : 'Data provided must be in JSON format.' }, 400
+            return { 'message' : 'Data provided must be in JSON format.' }, 500
 
         data = json.loads(request.data)
         try:
             self.switch.set_status(data['status'])
         except:
-            return { 'message' : 'ERROR: failed to set switch status' }, 400
+            return { 'message' : 'ERROR: failed to set switch status' }, 500
 
         return { 'status' : data['status'] }
 

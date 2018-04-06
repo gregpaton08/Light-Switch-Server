@@ -1,6 +1,6 @@
 
 function updateStatus() {
-    // loading = document.getElementById('loading');
+    loading = document.getElementById('loading');
     loadError = document.getElementById('load-error');
     onButton = document.getElementById('on-button');
     offButton = document.getElementById('off-button');
@@ -20,13 +20,27 @@ function updateStatus() {
             }
         }
     })
-    .fail(function() {
-        onButton.style.display = 'none';
-        offButton.style.display = 'none';
-        loadError.style.display = 'block';
+    .fail(function(jqxhr, textStatus, error) {
+        console.log(jqxhr.responseJSON.message);
+        console.log(jqxhr, textStatus, error);
+        if (jqxhr.status == 500) {
+            console.log('retrying...');
+            onButton.style.display = 'none';
+            offButton.style.display = 'none';
+            loading.style.display = 'block'
+            $.ajax(this);
+            return;
+        }
+        else {
+            console.log('unhandled error', jqxhr.status);
+            onButton.style.display = 'none';
+            offButton.style.display = 'none';
+            loading.style.display = 'none'
+            loadError.style.display = 'block';
+        }
     })
-    .always(function() {
-        document.getElementById('loading').style.display = 'none';
+    .done(function() {
+        loading.style.display = 'none'
     });
 }
 
@@ -42,6 +56,10 @@ window.onload = function() {
                 updateStatus();
             }
         })
+        .fail(function(jqxhr, textStatus, error) {
+            console.log(jqxhr.responseJSON.message);
+            console.log(jqxhr, textStatus, error);
+        });
     });
 
     document.getElementById('loading').display = 'block';
