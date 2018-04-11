@@ -33,3 +33,16 @@ fuser <port num>/tcp
 # kill processes listening on port
 fuser <port num>/txp -k
 ```
+
+## Trouble Shooting
+
+Address already in use
+
+```
+sudo service light_switch stop
+ps -fA | grep python
+```
+
+The number in the second column is the PID
+
+`sudo kill -9 <PID>`
