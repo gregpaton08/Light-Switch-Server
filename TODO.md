@@ -1,6 +1,7 @@
 # To Do  
 
-## Tasks 
+## Tasks
+* bug: see error_log.txt for details 
 * Implement authentication for web and mobile
 * bug: fix this error:
 ```
