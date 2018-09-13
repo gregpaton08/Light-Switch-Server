@@ -6,4 +6,4 @@ build
 crontest*
 .rf24.stubs.status.pkl
 *.sqlite
-
+.temp.*
